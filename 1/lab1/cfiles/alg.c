@@ -6,7 +6,8 @@
 #include "check_N.h"
 
 
-void alg(Matrix *pmtr, int numbofLines){
+void alg(Matrix *pmtr){
+	int numbofLines = pmtr->lines;
 	for (int i=0; i< numbofLines; i++){
 		int lnlength = ((*pmtr).matr)[i].n;
 		int firstI = -1; // prev < i
@@ -14,12 +15,12 @@ void alg(Matrix *pmtr, int numbofLines){
 		double tmp;
 		for (int j=1; j< lnlength; j++){
 			if (firstI == -1){
-				if (((*pmtr).matr)[i].a[j-1] < ((*pmtr).matr)[i].a[j]){
+				if ((pmtr->matr)[i].a[j-1] < (pmtr->matr)[i].a[j]){
 					firstI = j;
-					tmp = ((*pmtr).matr)[i].a[j];
+					tmp = (pmtr->matr)[i].a[j];
 				}
 			}
-			if (((*pmtr).matr)[i].a[j-1] > ((*pmtr).matr)[i].a[j]){
+			if ((pmtr->matr)[i].a[j-1] > (pmtr->matr)[i].a[j]){
 				lastJ = j;
 			}
 		}

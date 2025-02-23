@@ -12,52 +12,50 @@
 bool check_Number(char *text);
 
 
-#define TRUE 1
-#define FALSE 0
+#define BAD -1 // fix1
+#define GOOD 0 // fix1
 
 
 
 
 int check_Line(char *str, Line *ln){
 	if (str[0] == '\0'){
-		return -1;
+		return BAD;
 	}
 	char *srk = strdup(str);
 	char *token = strtok(srk, " ");
-	bool isOk = TRUE;
-	// Line *ln = malloc(sizeof(Line)*1);
-	// (*ln).a = malloc(sizeof((*ln).a));
+	bool isOk = true;
 	int cnt = 0;
 	double *elems = malloc(0);
-	// printf("%d", sizeof(elems) / sizeof(double));
 	while (token != NULL){
 		int checker = check_Number(token);
-		// printf("\nbooL:%d", checker);
 		if (checker == 0){
-			isOk = FALSE;
+			isOk = false;
 			free(srk);
 			free(token);
 			free(elems);
-			return -1;
+			return BAD;
 		}
 		double a = atof(token);
 		elems = realloc(elems, sizeof(double)+sizeof(double)*cnt);
+		if (elems == NULL){ return BAD;}
 		elems[cnt] = a;
 		cnt++;
 		token = strtok(NULL, " ");
 	}
 	free(srk);
 	free(token);
-	if (isOk == TRUE){
+	if (isOk == true){
 		if (cnt != (*ln).n){
 			free(elems);
-			return -1;
+			return BAD;
 		}
 		for (int i=0; i<cnt; i++){
 			(*ln).a[i] = elems[i];
 		}
 		free(elems);
-		return 0; // (good)
+		return GOOD; // (good)
 	}
+	return BAD; // fix1
 }
 

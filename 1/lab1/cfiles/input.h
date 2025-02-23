@@ -2,5 +2,5 @@
 
 #ifndef input_h
 #define input_h
-void input(Line *lns, int numbofLines);
+int input(Matrix *pmtr);
 #endif

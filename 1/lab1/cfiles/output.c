@@ -2,7 +2,10 @@
 #include "check_N.h"
 #include <stdio.h>
 
-void output(Matrix matr, int numbofLines){
+// void output(Matrix matr, int numbofLines){
+void output(Matrix *pmatr){
+	int numbofLines = pmatr->lines;
+	Matrix matr = *pmatr;
 	for (int i=0; i<numbofLines; i++){
 		int lnlength = ((matr.matr)[i].n);
 		printf("\nN=%d", lnlength);

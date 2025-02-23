@@ -8,10 +8,13 @@
 #include "alg.h"
 #include "erase.h"
 
+#define BAD -1
+#define EXIT -10
+
+
 
 int check_Line(char *str, Line *ln);
 int get_N();
-void alg(Matrix *pmtr, int numbofLines);
 
 
 
@@ -19,20 +22,21 @@ void alg(Matrix *pmtr, int numbofLines);
 int main(){
 	printf("\nВведите кол-во строк матрицы.");
 	int numbofLines = get_N();
-	if (numbofLines == -2){
-		printf("\nexiting...\n");
-		exit(0);
-	}
 	Line *lns = malloc(numbofLines*sizeof(Line));
 	Matrix matr = {numbofLines, lns};
-	input(lns, numbofLines);
+	// int inp = input(lns, numbofLines);
+	int inp = input(&matr);
+	if (inp == EXIT || inp == BAD){
+		printf("\nexiting...");
+		free(lns);
+		exit(0);
+	}
 	printf("\n\nИсходная матрица:\n");
-	output(matr, numbofLines);
-	alg(&matr, numbofLines);
+	output(&matr);
+	alg(&matr);
 	printf("\n\nПосле применения алгоритма:\n");
-	output(matr, numbofLines);
-	erase(&matr, numbofLines);
-	free(lns);
+	output(&matr);
+	erase(&matr);
 	return 0;
 }
 

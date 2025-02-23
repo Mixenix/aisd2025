@@ -7,19 +7,27 @@
 #include "check_N.h"
 // #include "structs.h"
 
-void input(Line *lns, int numbofLines){
+#define BAD -1
+#define EXIT -10
+
+// int input(Line *lns, int numbofLines){
+int input(Matrix *pmtr){
+	Line *lns = pmtr->matr;
+	int numbofLines = pmtr->lines;
 	char *str;
 	Line *pln;
 	double *line_elems;
 	for (int i=0; i<numbofLines; i++){
 		printf("\nВведите кол-во элементов в строке.");
 		int n = get_N();
-		if (n == -2){
-			printf("\nexiting...\n");
-			free(lns);
-			exit(0);
+		if (n == EXIT){
+			return EXIT;
 		}
 		line_elems = malloc(sizeof(double)*n);
+		if (line_elems == NULL){
+			printf("Ошибка выделения памяти");
+			return BAD;
+		}
 		Line ln = {n, line_elems};
 		pln = &ln;
 		
@@ -48,5 +56,6 @@ void input(Line *lns, int numbofLines){
 		lns[i] = *pln;
 		free(str);
 	}
+	return 0;
 	
 }
