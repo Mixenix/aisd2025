@@ -1,5 +1,0 @@
-gcc main.c input.c output.c alg.c erase.c check_Number.c check_Line.c check_N.c -o main -lreadline
-
-пример
-1 0 2 3 1
-1 0 1 3 2

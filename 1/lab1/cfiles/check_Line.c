@@ -26,7 +26,8 @@ int check_Line(char *str, Line *ln){
 	char *token = strtok(srk, " ");
 	bool isOk = true;
 	int cnt = 0;
-	double *elems = malloc(0);
+	// double *elems = malloc(0);
+	double *elems = NULL;
 	while (token != NULL){
 		int checker = check_Number(token);
 		if (checker == 0){
@@ -56,6 +57,7 @@ int check_Line(char *str, Line *ln){
 		free(elems);
 		return GOOD; // (good)
 	}
+	free(elems);
 	return BAD; // fix1
 }
 
