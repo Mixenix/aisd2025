@@ -26,7 +26,6 @@ int check_Line(char *str, Line *ln){
 	char *token = strtok(srk, " ");
 	bool isOk = true;
 	int cnt = 0;
-	// double *elems = malloc(0);
 	double *elems = NULL;
 	while (token != NULL){
 		int checker = check_Number(token);

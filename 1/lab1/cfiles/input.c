@@ -38,7 +38,8 @@ int input(Matrix *pmtr){
 			free(str);
 			free(line_elems);
 			free(lns);
-			exit(0);
+			// exit(0);
+			return EXIT;
 		}
 		int test = check_Line(str, pln);
 		while (test != 0){
@@ -49,7 +50,7 @@ int input(Matrix *pmtr){
 				printf("\nexiting...\n");
 				free(str);
 				free(lns);
-				exit(0);
+				return EXIT;
 			}
 			test = check_Line(str, pln);
 		}

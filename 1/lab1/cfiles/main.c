@@ -29,7 +29,8 @@ int main(){
 	if (inp == EXIT || inp == BAD){
 		printf("\nexiting...");
 		free(lns);
-		exit(0);
+		// exit(0)
+		return -1;
 	}
 	printf("\n\nИсходная матрица:\n");
 	output(&matr);
