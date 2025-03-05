@@ -45,7 +45,7 @@ int main(){
 					for (int j=0; j <nOfAngles; j++){
 						if (res[j].res == -10){
 							Task task = {res[j].ang, 0, NULL};
-							put(&toChannels[i], task);
+							if (put(&toChannels[i], task) == BAD){goto brk;}
 							break;
 						}
 					}
@@ -53,7 +53,7 @@ int main(){
 				if (((double)rand() / RAND_MAX < p2) && (!isEmpty(&toChannels[i]))){
 					Task task = pop(&toChannels[i]);
 					task.res = calcSin(task.ang);
-					put(&toLeader[i], task);
+					if (put(&toLeader[i], task) == BAD){goto brk;}
 				}
 
 				if (((double)rand() / RAND_MAX < p3) && (!isEmpty(&toLeader[i]))){
@@ -76,6 +76,7 @@ int main(){
 			clear(&toLeader[i]);
 			clear(&toChannels[i]);
 		}
-		}
+		brk:
+	}
 	return 0;
 }

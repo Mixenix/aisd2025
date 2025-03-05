@@ -15,6 +15,8 @@
 #define POS1 3
 #define POS2 4
 #define POS3 5
+#define EPSILON 0.000000000001
+#define DELTA 1.0
 
 bool check_Number(char *text);
 bool isInteger(double N);
@@ -30,12 +32,10 @@ int input(int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *p
 	int chck = check_Line(inp, nOfChnls, ang1, ang2, p1, p2, p3);
 	while (chck	!= GOOD){
 		printf("\nНекорректный формат, попробуйте ещё раз:\n");
-		// printf(INV);
 		free(inp);
 		inp = readline(INV);
 		if (inp == NULL){
 			printf("\nexiting///");
-			free(inp);
 			return EXIT;
 		}
 		chck = check_Line(inp, nOfChnls, ang1, ang2, p1, p2, p3);
@@ -45,127 +45,83 @@ int input(int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *p
 }
 
 
-// int get_N(){
-// 	char *text = readline("\nВведите число >=1: ");
-// 	int checker = check_N(text);
-// 	while (checker != 0){
-// 		if (checker == EXIT){return EXIT;}
-// 		free(text);
-// 		text = readline("\nЧто-то не так, введите число >=1: ");
-// 		checker = check_N(text);
-// 	}
-// 	int n = atoi(text);
-// 	free(text);
-// 	return n;
-// }
-
 int check_Line(char *str, int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *p3){
 	if (str[0] == '\0'){
 		return BAD;
 	}
 	char *srk = strdup(str);
 	char *token = strtok(srk, " ");
-	// bool isOk = true;
 	int cntr = 0;
-	int cnt = 0;
-	bool checker = false;
-	// double *elems = NULL;
 	while (token != NULL){
 		if (cntr == CHNLS){
-			checker = check_Number(token);
-			if (checker == false){
+			if (check_Number(token) == false){
 				free(srk);
-				// free(token);
 				return BAD;
 			}
 			double f = atof(token);
-			checker = isInteger(f);
-			if (checker == false){
+			if (isInteger(f) == false){
 				printf("hahFFFFa");
 				free(srk);
-				// free(token);
 				return BAD;
 			}
-			// if ((int)f <= 0){
-			// 	free(srk);
-			// 	// free(token);
-			// 	return BAD;
-			// }
 			*nOfChnls = (int)f;
 		}
 		else if (cntr == DEG1){
-			checker = check_Number(token);
-			if (checker == false){
+			if (check_Number(token) == false){
 				free(srk);
-				// free(token);
 				return BAD;
 			}
 			double f = atof(token);
-			checker = isInteger(f);
-			if (checker == false){
+			if (isInteger(f) == false){
 				free(srk);
-				// free(token);
 				return BAD;
 			}
 			*ang1 = (int)f;
 		}
 		else if (cntr == DEG2){
-			checker = check_Number(token);
-			if (checker == false){
+			if (check_Number(token) == false){
 				free(srk);
-				// free(token);
 				return BAD;
 			}
 			double f = atof(token);
-			checker = isInteger(f);
-			if ((checker == false) || (f < *ang1) || (f < 0)){
+			if ((isInteger(f) == false) || (f < *ang1) || (f < 0)){
 				free(srk);
-				// free(token);
 				return BAD;
 			}
 			*ang2 = (int)f;
 		}
 		else if(cntr == POS1){
-			checker = check_Number(token);
-			if (checker == false){
+			if (check_Number(token) == false){
 				free(srk);
-				// free(token);
 				return BAD;
 			}
 			double f = atof(token);
-			if ((f < 0.000000000001) || (f > 1.0000001)){
+			if ((f < EPSILON) || (f > DELTA)){
 				free(srk);
-				// free(token);
 				return BAD;
 			}
 			*p1 = f;
 		}
 		else if(cntr == POS2){
-			checker = check_Number(token);
-			if (checker == false){
+			if (check_Number(token) == false){
 				free(srk);
-				// free(token);
 				return BAD;
 			}
 			double f = atof(token);
-			if ((f < 0.000000000001) || (f > 1.0)){
+			if ((f < EPSILON) || (f > DELTA)){
 				free(srk);
-				// free(token);
 				return BAD;
 			}
 			*p2 = f;
 		}
 		else if(cntr == POS3){
-			checker = check_Number(token);
-			if (checker == false){
+			if (check_Number(token) == false){
 				free(srk);
-				// free(token);
 				return BAD;
 			}
 			double f = atof(token);
-			if ((f < 0.000000000001) || (f > 1.0)){
+			if ((f < EPSILON) || (f > DELTA)){
 				free(srk);
-				// free(token);
 				return BAD;
 			}
 			*p3 = f;
@@ -178,7 +134,6 @@ int check_Line(char *str, int *nOfChnls, int *ang1, int *ang2, double *p1, doubl
 		cntr++;		
 	}
 	if (cntr <= POS3){
-		// printf()
 		free(srk);
 		free(token);
 		return BAD;
@@ -236,7 +191,6 @@ bool check_Number(char *text) {
 
     char const first_character = text[0];
     bool is_character_sign = (first_character == '-' || first_character == '+');
-    // verifications for first left character
     if ((is_character_sign || first_character == '.') && length == 1) {
         return false;
     }
@@ -253,7 +207,7 @@ bool isInteger(double N){
  
     double temp2 = N - X;
  
-    if (temp2 > 0.000000001) { // fix1
+    if (temp2 > 0.000000001) {
         return false;
     }
     return true;

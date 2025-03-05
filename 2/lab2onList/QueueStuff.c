@@ -1,19 +1,17 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include "structs.h"
+#include "QueueStuff.h"
 
+#define BAD -2
+#define GOOD 0
 
 void init(Queue *q);
 bool isEmpty(Queue *q);
-void put(Queue *q, Task task);
+int put(Queue *q, Task task);
 Task pop(Queue *q);
 
 
 
 bool isEmpty(Queue *q){
-	if (q->front == NULL){return true;}
-	return false;
+	return q->front == NULL;
 }
 
 
@@ -22,18 +20,22 @@ void init(Queue *q){
 	q->rear = NULL;
 }
 
-void put(Queue *q, Task task){
+int put(Queue *q, Task task){
 	Task *new = (Task *)malloc(sizeof(Task));
+	if (new == NULL){
+		return BAD;
+	}
 	new->ang = task.ang;
 	new->res = task.res;
 	new->next = NULL;
 
 	if (isEmpty(q)){
 		q->front = q->rear = new;
-		return;
+		return GOOD;
 	}
 	q->rear->next = new;
 	q->rear = new;
+	return GOOD;
 }
 
 Task pop(Queue *q){

@@ -1,11 +1,12 @@
-#include <stdio.h>
-#include <stdbool.h>
-#include "structs.h"
+#include "QueueStuff.h"
+
+#define BAD -2
+#define GOOD 0
 
 void init(Queue *q);
 bool isEmpty(Queue *q);
 bool isFull(Queue *q);
-void put(Queue *q, Task task);
+int put(Queue *q, Task task);
 Task pop(Queue *q);
 
 
@@ -16,8 +17,7 @@ void init(Queue *q){
 }
 
 bool isEmpty(Queue *q){
-	if (q->front == q->rear){return true;}
-	return false;
+	return q->front == q->rear;
 }
 
 bool isFull(Queue *q){
@@ -25,13 +25,14 @@ bool isFull(Queue *q){
 	return false;
 }
 
-void put(Queue *q, Task task){
+int put(Queue *q, Task task){
 	if (isFull(q)){
 		printf("\nОчередь полная...");
-		return;
+		return BAD;
 	}
 	q->tasks[q->rear] = task;
 	q->rear = (q->rear+1) % 1000;
+	return GOOD;
 }
 
 Task pop(Queue *q){
