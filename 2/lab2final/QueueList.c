@@ -3,25 +3,33 @@
 #define BAD -2
 #define GOOD 0
 
-void initL(QueueList *q);
-bool isEmptyL(QueueList *q);
-int putL(QueueList *q, Task task);
-Task popL(QueueList *q);
-void listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3);
+struct Task{
+	int ang;
+	double res;
+	Task *next;
+};
+
+struct Queue{
+	Task *front;
+	Task *rear;
+};
 
 
+bool onList(){return true;}
 
-bool isEmptyL(QueueList *q){
+
+bool isEmpty(Queue *q){
 	return q->front == NULL;
 }
 
+bool isFull(Queue *q){return false;}
 
-void initL(QueueList *q){
+void init(Queue *q){
 	q->front = NULL;
 	q->rear = NULL;
 }
 
-int putL(QueueList *q, Task task){
+int put(Queue *q, Task task){
 	Task *new = (Task *)malloc(sizeof(Task));
 	if (new == NULL){
 		return BAD;
@@ -30,7 +38,7 @@ int putL(QueueList *q, Task task){
 	new->res = task.res;
 	new->next = NULL;
 
-	if (isEmptyL(q)){
+	if (isEmpty(q)){
 		q->front = q->rear = new;
 		return GOOD;
 	}
@@ -39,8 +47,8 @@ int putL(QueueList *q, Task task){
 	return GOOD;
 }
 
-Task popL(QueueList *q){
-	if (isEmptyL(q)){
+Task pop(Queue *q){
+	if (isEmpty(q)){
 		printf("\nОчередь пустая...");
 		Task nothing = {-10, -10, NULL};
 		return nothing;
@@ -55,13 +63,18 @@ Task popL(QueueList *q){
 	return task;
 }
 
+void clear(Queue *q){
+	while (!isEmpty(q)){
+		pop(q);
+	}
+}
 
 void listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){
-	QueueList toChannels[nOfChnls];
-    QueueList toLeader[nOfChnls];
+	Queue toChannels[nOfChnls];
+    Queue toLeader[nOfChnls];
     for (int i = 0; i < nOfChnls; i++) {
-        initL(&toChannels[i]);
-        initL(&toLeader[i]);
+        init(&toChannels[i]);
+        init(&toLeader[i]);
     }
 
     int nOfAngles = ang2 - ang1 + 1;
@@ -78,9 +91,9 @@ void listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double 
             if (res[j].res != -10) continue;
             for (int i = 0; i < nOfChnls; i++) {
                 double randomvalue = (double)rand() / RAND_MAX;
-                if (randomvalue < p1 && isEmptyL(&toChannels[i])) {
+                if (randomvalue < p1 && isEmpty(&toChannels[i])) {
                     Task task = {res[j].ang, 0, NULL};
-                    int putter = putL(&toChannels[i], task);
+                    int putter = put(&toChannels[i], task);
                     if (putter == GOOD) {
                         break;
                     }
@@ -90,18 +103,18 @@ void listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double 
         }
         
         for (int i = 0; i < nOfChnls; i++) {
-            if (isEmptyL(&toChannels[i])) continue;
+            if (isEmpty(&toChannels[i])) continue;
             double randomvalue = (double)rand() / RAND_MAX;
             if (randomvalue < p2) {
-                Task task = popL(&toChannels[i]);
+                Task task = pop(&toChannels[i]);
                 task.res = calcSin(task.ang);
-                if (putL(&toLeader[i], task) == BAD){goto brk;}
+                if (put(&toLeader[i], task) == BAD){goto brk;}
             }
         }
         
         for (int i = 0; i < nOfChnls; i++) {
-            while (!isEmptyL(&toLeader[i])) {
-                Task task = popL(&toLeader[i]);
+            while (!isEmpty(&toLeader[i])) {
+                Task task = pop(&toLeader[i]);
                 for (int j = 0; j < nOfAngles; j++) {
                     if (res[j].ang == task.ang && res[j].res == -10) {
                         res[j].res = task.res;
@@ -123,3 +136,5 @@ void listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double 
 	} 
 	brk:
 }
+
+void vectorProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){return;}

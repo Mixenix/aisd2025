@@ -3,7 +3,7 @@
 #define GOOD 0
 #define BAD -2
 #define EXIT -10
-#define INV "Введите через пробел: (1 - на массиве или 2 - на списке), кол-во ведомых узлов, угол1, угол2 и вероятности p1, p2, p3:\n"
+#define INV "Введите через пробел кол-во ведомых узлов, угол1, угол2 и вероятности p1, p2, p3:\n"
 
 int main() {
     int nOfChnls;
@@ -12,14 +12,14 @@ int main() {
     double p1, p2, p3;
     int inp = GOOD;
     while (inp != EXIT) {
-    	int realtype = 1; // по умолчанию - на массиве
-        inp = input(&realtype, &nOfChnls, &ang1, &ang2, &p1, &p2, &p3);
+    	int realtype = onList(); // по умолчанию - на массиве
+        inp = input(&nOfChnls, &ang1, &ang2, &p1, &p2, &p3);
         if (inp == EXIT) return 0;
-		if (realtype == 1){
+		if (realtype == false){
 			printf("\n.На массиве");
 	        vectorProcess(nOfChnls, ang1, ang2, p1, p2, p3);
 		}
-		else if(realtype == 2){
+		else{
 			printf("\n.На списке");
 			listProcess(nOfChnls, ang1, ang2, p1, p2, p3);
         }

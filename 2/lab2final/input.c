@@ -3,13 +3,13 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "all.h"
 
 
-#define INV "Введите через пробел: (1 - на массиве или 2 - на списке), кол-во ведомых узлов, угол1, угол2 и вероятности p1, p2, p3:\n"
+#define INV "Введите через пробел: кол-во ведомых узлов, угол1, угол2 и вероятности p1, p2, p3:\n"
 #define EXIT -10
 #define BAD -2
 #define GOOD 0
-#define TYPE -1
 #define CHNLS 0
 #define DEG1 1
 #define DEG2 2
@@ -19,18 +19,15 @@
 #define EPSILON 0.000000000001
 #define DELTA 1.0
 
-bool check_Number(char *text);
-bool isInteger(double N);
-int check_Line(char *str, int *VecOrList, int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *p3);
 
-int input(int *VecOrList, int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *p3){
+int input(int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *p3){
 	char *inp = readline(INV);
 	if (inp == NULL){
 		printf("\nexiting///");
 		free(inp);
 		return EXIT;
 	}
-	int chck = check_Line(inp, VecOrList, nOfChnls, ang1, ang2, p1, p2, p3);
+	int chck = check_Line(inp, nOfChnls, ang1, ang2, p1, p2, p3);
 	while (chck	!= GOOD){
 		printf("\nНекорректный формат, попробуйте ещё раз:\n");
 		free(inp);
@@ -39,38 +36,22 @@ int input(int *VecOrList, int *nOfChnls, int *ang1, int *ang2, double *p1, doubl
 			printf("\nexiting///");
 			return EXIT;
 		}
-		chck = check_Line(inp, VecOrList, nOfChnls, ang1, ang2, p1, p2, p3);
+		chck = check_Line(inp, nOfChnls, ang1, ang2, p1, p2, p3);
 	}
 	free(inp);
 	return GOOD;
 }
 
 
-int check_Line(char *str, int *VecOrList, int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *p3){
+int check_Line(char *str, int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *p3){
 	if (str[0] == '\0'){
 		return BAD;
 	}
 	char *srk = strdup(str);
 	char *token = strtok(srk, " ");
-	int cntr = -1;
+	int cntr = 0;
 	while (token != NULL){
-		if (cntr == TYPE){
-			if (check_Number(token) == false){
-				free(srk);
-				return BAD;
-			}
-			double f = atof(token);
-			if (isInteger(f) == false){
-				free(srk);
-				return BAD;
-			}
-			if ((int)f != 1 && (int)f != 2){
-				free(srk);
-				return BAD;
-			}
-			*VecOrList = (int)f;
-		}
-		else if (cntr == CHNLS){
+		if (cntr == CHNLS){
 			if (check_Number(token) == false){
 				free(srk);
 				return BAD;
