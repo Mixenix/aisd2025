@@ -1,5 +1,6 @@
 #include "all.h"
 
+#define MAX_SIZE 1000
 #define BAD -2
 #define GOOD 0
 
@@ -10,7 +11,7 @@ struct Task{
 };
 
 struct Queue{
-	Task tasks[1000];
+	Task tasks[MAX_SIZE];
 	int front;
 	int rear;
 };
@@ -29,8 +30,7 @@ bool isEmpty(Queue *q){
 }
 
 bool isFull(Queue *q){
-	if ((q->rear + 1) % 1000 == q->front){return true;}
-	return false;
+	return (q->rear + 1) % MAX_SIZE == q->front;
 }
 
 int put(Queue *q, Task task){
@@ -39,7 +39,7 @@ int put(Queue *q, Task task){
 		return BAD;
 	}
 	q->tasks[q->rear] = task;
-	q->rear = (q->rear+1) % 1000;
+	q->rear = (q->rear+1) % MAX_SIZE;
 	return GOOD;
 }
 
@@ -50,20 +50,20 @@ Task pop(Queue *q){
 		return nothing;
 	}
 	Task task = q->tasks[q->front];
-	q->front = (q->front +1) % 1000;
+	q->front = (q->front +1) % MAX_SIZE;
 	return task;
 }
 
-void vectorProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){
-	Queue toChannels[nOfChnls];
-	Queue toLeader[nOfChnls];
+int vectorProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){
+	Queue *toChannels = malloc(sizeof(Queue)*nOfChnls);
+	Queue *toLeader = malloc(sizeof(Queue)*nOfChnls);
 	for (int i = 0; i < nOfChnls; i++) {
 	    init(&toChannels[i]);
 	    init(&toLeader[i]);
 	}
 
 	int nOfAngles = ang2 - ang1 + 1;
-	Task res[nOfAngles];
+	Task *res = malloc(sizeof(Task)*nOfAngles);
 	for (int i = 0; i < nOfAngles; i++) {
 	    res[i].ang = ang1 + i;
 	    res[i].res = -10;
@@ -99,12 +99,15 @@ void vectorProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, doubl
 	    for (int i = 0; i < nOfChnls; i++) {
 	        while (!isEmpty(&toLeader[i])) {
 	            Task task = pop(&toLeader[i]);
-	            for (int j = 0; j < nOfAngles; j++) {
-	                if (res[j].ang == task.ang && res[j].res == -10) {
-	                    res[j].res = task.res;
-	                    done++;
-	                    break;
-	                }
+	            double randomvalue = (double)rand() / RAND_MAX;
+                if (randomvalue < p3){
+		            for (int j = 0; j < nOfAngles; j++) {
+		                if (res[j].ang == task.ang && res[j].res == -10) {
+		                    res[j].res = task.res;
+		                    done++;
+		                    break;
+		                }
+		            }
 	            }
 	        }
 	    }
@@ -115,8 +118,11 @@ void vectorProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, doubl
 	    printf("%d\t%lf\n", res[i].ang, res[i].res);
 	}
 	brk:
+	free(res);
+	free(toLeader);
+	free(toChannels);
 }
 
-void listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){return;}
+int listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){return GOOD;}
 // здесь то же самое, что и в QueueList.c
 

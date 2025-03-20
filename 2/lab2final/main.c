@@ -17,11 +17,17 @@ int main() {
         if (inp == EXIT) return 0;
         if (realtype == false){ // false - значит на массиве, true - на списке
 			printf("\n.На массиве");
-	        vectorProcess(nOfChnls, ang1, ang2, p1, p2, p3);
+	        if (vectorProcess(nOfChnls, ang1, ang2, p1, p2, p3) == BAD){
+	        	printf("\nerror, exit...");
+	        	return 1;
+	        }
 		}
 		else{
 			printf("\n.На списке");
-			listProcess(nOfChnls, ang1, ang2, p1, p2, p3);
+			if (listProcess(nOfChnls, ang1, ang2, p1, p2, p3) == BAD){
+				printf("\nerror, exit...");
+				return 1;
+			}
         }
     }
     return 0;

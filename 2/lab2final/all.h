@@ -16,8 +16,8 @@ bool isFull(Queue *q);
 int put(Queue *q, Task task);
 Task pop(Queue *q);
 bool onList();
-void listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3);
-void vectorProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3);
+int listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3);
+int vectorProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3);
 #endif
 
 

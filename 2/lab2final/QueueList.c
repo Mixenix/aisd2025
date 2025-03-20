@@ -69,17 +69,20 @@ void clear(Queue *q){
 	}
 }
 
-void listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){
-	Queue toChannels[nOfChnls];
-    Queue toLeader[nOfChnls];
+int listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){
+	Queue *toChannels = malloc(sizeof(Queue)*nOfChnls);
+    Queue *toLeader = malloc(sizeof(Queue)*nOfChnls);
+    if (toChannels == NULL || toLeader == NULL){
+    	return BAD;
+    }
     for (int i = 0; i < nOfChnls; i++) {
         init(&toChannels[i]);
         init(&toLeader[i]);
-    }
+    }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 
     int nOfAngles = ang2 - ang1 + 1;
-    Task res[nOfAngles];
-    for (int i = 0; i < nOfAngles; i++) {
+    Task *res = malloc(sizeof(Task)*nOfAngles);
+    for (int i = 0; i < nOfAngles; i++){
         res[i].ang = ang1 + i;
         res[i].res = -10;
         res[i].next = NULL;
@@ -105,7 +108,7 @@ void listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double 
         for (int i = 0; i < nOfChnls; i++) {
             if (isEmpty(&toChannels[i])) continue;
             double randomvalue = (double)rand() / RAND_MAX;
-            if (randomvalue < p2) {
+            if (randomvalue < p2){
                 Task task = pop(&toChannels[i]);
                 task.res = calcSin(task.ang);
                 if (put(&toLeader[i], task) == BAD){goto brk;}
@@ -113,14 +116,17 @@ void listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double 
         }
         
         for (int i = 0; i < nOfChnls; i++) {
-            while (!isEmpty(&toLeader[i])) {
+            while (!isEmpty(&toLeader[i])){
                 Task task = pop(&toLeader[i]);
-                for (int j = 0; j < nOfAngles; j++) {
-                    if (res[j].ang == task.ang && res[j].res == -10) {
-                        res[j].res = task.res;
-                        done++;
-                        break;
-                    }
+                double randomvalue = (double)rand() / RAND_MAX;
+                if (randomvalue < p3){
+	                for (int j = 0; j < nOfAngles; j++) {
+	                    if (res[j].ang == task.ang && res[j].res == -10) {
+	                        res[j].res = task.res;
+	                        done++;
+	                        break;
+	                    }
+	                }
                 }
             }
         }
@@ -133,9 +139,12 @@ void listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double 
     for (int i=0; i<nOfChnls; i++){
 		clear(&toLeader[i]);
 		clear(&toChannels[i]);
-	} 
+	}
 	brk:
+	free(res);
+	free(toLeader);
+	free(toChannels);
 }
 
-void vectorProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){return;}
+int vectorProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){return GOOD;}
 // наверху | чтобы занулить функцию, потому что прототип есть, а фактически она не нужна
