@@ -138,3 +138,4 @@ void listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double 
 }
 
 void vectorProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){return;}
+// наверху | чтобы занулить функцию, потому что прототип есть, а фактически она не нужна

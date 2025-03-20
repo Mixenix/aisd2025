@@ -15,7 +15,7 @@ int main() {
     	int realtype = onList(); // по умолчанию - на массиве
         inp = input(&nOfChnls, &ang1, &ang2, &p1, &p2, &p3);
         if (inp == EXIT) return 0;
-		if (realtype == false){
+        if (realtype == false){ // false - значит на массиве, true - на списке
 			printf("\n.На массиве");
 	        vectorProcess(nOfChnls, ang1, ang2, p1, p2, p3);
 		}

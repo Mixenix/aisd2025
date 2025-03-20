@@ -203,9 +203,6 @@ bool isInteger(double N){
     int X = N;
  
     double temp2 = N - X;
- 
-    if (temp2 > 0.000000001) {
-        return false;
-    }
-    return true;
+
+ 	return temp2 < EPSILON;
 }

@@ -118,4 +118,5 @@ void vectorProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, doubl
 }
 
 void listProcess(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){return;}
+// здесь то же самое, что и в QueueList.c
 
