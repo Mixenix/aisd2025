@@ -1,3 +1,5 @@
+#define MAX_SIZE 10000
+
 typedef struct Task {
     int ang;
     double res;
@@ -6,7 +8,7 @@ typedef struct Task {
 
 
 typedef struct QueueVec {
-	Task tasks[1000];
+	Task tasks[MAX_SIZE];
 	int front;
 	int rear;
 } QueueVec;
