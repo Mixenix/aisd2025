@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/myprog.dir/main.c.o CMakeFiles/myprog.dir/input.c.o CMakeFiles/myprog.dir/search.c.o CMakeFiles/myprog.dir/txtImport.c.o CMakeFiles/myprog.dir/remove.c.o -o myprog  -lreadline

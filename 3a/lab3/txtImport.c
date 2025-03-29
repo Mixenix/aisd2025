@@ -143,7 +143,7 @@ Table *readTableFromFile(char *filename){
 
 char *readtxtline(FILE *f){
 	int cap = 32,  next = 0, c;
-    char * p = malloc(cap);
+    char *p = malloc(cap);
     while( 1 ) { 
         if ( next == cap ) {
             p = realloc( p, cap *= 2 );
