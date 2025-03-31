@@ -10,6 +10,8 @@
 #define BAD -2
 #define GOOD 0
 
+#define ALLOC_ERROR "\nerror while allocating memory"
+#define MEMERR -11
 #define NOTUNIQUE -3
 #define SIZEEXCEEDED -4
 #define NOTDEFINEDYET -1

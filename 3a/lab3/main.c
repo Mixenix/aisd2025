@@ -7,16 +7,28 @@ void freedom(Table *tbl);
 
 int main() {
 	Table *tbl = malloc(sizeof(Table));
+	if (tbl == NULL){
+		printf(ALLOC_ERROR);
+		return 1;
+	}
 	tbl->msize = 0;
 	tbl->csize = 0;
 	tbl->ks = calloc(tbl->msize, sizeof(KeySpace));
-	
+	if (tbl->ks == NULL){
+		printf(ALLOC_ERROR);
+		return 1;
+	}
 	int inp = BAD;
 	int inpT = BAD;
 	int *tmp;
 	int checker = BAD;
 	while (inp != EXIT){
 		int *action = calloc(1, sizeof(int));
+		if (action == NULL){
+			print(ALLOC_ERROR);
+			freedom(tbl);
+			return 1;
+		}
 		inp = input(action, MENU);
 		while (inp != GOOD){
 			if (inp == EXIT){
@@ -30,20 +42,38 @@ int main() {
 		case 0: // инициализация новой
 			freedom(tbl);
 			tmp = calloc(1, sizeof(int));
+			if (tmp == NULL){
+				printf(ALLOC_ERROR);
+				return 1;
+			}
 			*tmp = -1;
 			inpT = input(tmp, "\nВведите размер пространства ключей: ");
 			while (inpT != GOOD && *tmp < 0){
 				if (inpT == EXIT){
 					free(tmp);
+					free(action);
 					return 0;
 				}
 				printf("\nЧто-то не так, ещё раз...");
 				inpT = input(tmp, "\nВведите размер пространства ключей: ");
 			}
 			tbl = malloc(sizeof(Table));
+			if (tbl == NULL){
+				printf(ALLOC_ERROR);
+				free(action);
+				free(tmp);
+				return 1;
+			}
 			tbl->msize = *tmp;
 			tbl->csize = 0;
 			tbl->ks = calloc(tbl->msize, sizeof(KeySpace));
+			if (tbl->ks == NULL){
+				printf(ALLOC_ERROR);
+				freedom(tbl);
+				free(action);
+				free(tmp);
+				return 1;
+			}
 			free(tmp);
 			break;
 		case 1: // вставка	
@@ -52,7 +82,6 @@ int main() {
 			if (keyToInsertTo == NULL){
 				free(action);
 				freedom(tbl);
-				printf("\nexiting...");
 				return 0;
 			}
 			char *infoToInsert = readline("\nВведите информацию: ");
@@ -60,7 +89,6 @@ int main() {
 				free(keyToInsertTo);
 				free(action);
 				freedom(tbl);
-				printf("\nexiting...");
 				return 0;
 			}
 			checker = insert(tbl, keyToInsertTo, infoToInsert);
@@ -71,6 +99,13 @@ int main() {
 			case NOTUNIQUE:
 				printf("\nИнформация неуникальная, вставлять не будем...\n");
 				break;
+			case MEMERR:
+				printf(ALLOC_ERROR);
+				freedom(tbl);
+				free(keyToInsertTo);
+				free(infoToInsert);
+				free(action);
+				return 1;
 			}
 			
 			break;
@@ -78,13 +113,21 @@ int main() {
 			char *keyToDel2 = readline("\nВведите ключ для удаления значения по нему: ");
 			if (keyToDel2 == NULL){
 				freedom(tbl);
+				free(action);
 				return 0;
 			}
 			tmp = calloc(1, sizeof(int));
+			if (tmp == NULL){
+				printf(ALLOC_ERROR);
+				freedom(tbl);
+				free(action);
+				return 1;
+			}
 			inpT = input(tmp, "\nВведите версию для удаления: ");
 			while (inpT != GOOD){
 				if (inpT == EXIT){
 					free(tmp);
+					free(action);
 					freedom(tbl);
 					return 0;
 				}
@@ -103,6 +146,7 @@ int main() {
 			char *keyToDel = readline("\nВведите ключ для удаления всех значений по нему: ");
 			if (keyToDel == NULL){
 				freedom(tbl);
+				free(action);
 				return 0;
 			}
 			checker = removeByKey(tbl, keyToDel);
@@ -113,6 +157,11 @@ int main() {
 			break;
 		case 4:
 			char *keyToFind = readline("\nВведите ключ для поиска: ");
+			if (keyToFind == NULL){
+				freedom(tbl);
+				free(action);
+				return 0;
+			}
 			// Table *res = searchByKey(&tbl, keyToFind);
 			Table *res = searchAllByKey(tbl, keyToFind);
 			if (res){
@@ -139,7 +188,7 @@ int main() {
 			}
 			char *result = searchByKeyAndRelease(tbl, keyToFind2, *tmp);
 			if (result == NULL){
-				printf("\nnothing found...");
+				printf("\nnothing found or there is an error...");
 			}
 			else{
 				printf("\n%d %s", *tmp, result);
@@ -152,6 +201,7 @@ int main() {
 			freedom(tbl);
 			char *filename = readline("\nВведите имя файла: ");
 			if (filename == NULL){
+				free(action);
 				return 0;
 			}
 			tbl = readTableFromFile(filename);
@@ -166,9 +216,6 @@ int main() {
 		printTable(tbl);
 		free(action);
 	}
-	
-	
-
 
 	printTable(tbl);
 	freedom(tbl);
@@ -177,6 +224,9 @@ int main() {
 
 int insert(Table *tbl, char *keyToInsertTo, char* infoToInsert) {
 	Node *toAdd = malloc(sizeof(Node));
+	if (toAdd == NULL){
+		return MEMERR;
+	}
 	toAdd->release = NOTDEFINEDYET;
 	toAdd->info = infoToInsert;
 	toAdd->next = NULL;
@@ -217,7 +267,7 @@ int insert(Table *tbl, char *keyToInsertTo, char* infoToInsert) {
 
 void freedom(Table *tbl) {
 	if (tbl == NULL) return;
-	
+
 	if (tbl->ks != NULL) {
 		for (int i = 0; i < tbl->csize; i++) {
 			free(tbl->ks[i].key);

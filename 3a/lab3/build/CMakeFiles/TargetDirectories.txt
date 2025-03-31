@@ -1,3 +1,0 @@
-/home/students/s/safin.ai/algs/aisd2025/3a/lab3/build/CMakeFiles/myprog.dir
-/home/students/s/safin.ai/algs/aisd2025/3a/lab3/build/CMakeFiles/edit_cache.dir
-/home/students/s/safin.ai/algs/aisd2025/3a/lab3/build/CMakeFiles/rebuild_cache.dir
