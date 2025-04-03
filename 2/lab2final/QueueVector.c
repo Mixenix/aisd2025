@@ -1,9 +1,5 @@
 #include "all.h"
 
-#define MAX_SIZE 1000
-#define BAD -2
-#define GOOD 0
-
 struct Task{
 	int ang;
 	double res;
@@ -33,19 +29,20 @@ bool isFull(Queue *q){
 	return (q->rear + 1) % MAX_SIZE == q->front;
 }
 
-int put(Queue *q, Task task){
+void put(Queue *q, Task task, ERROR *err){
 	if (isFull(q)){
 		printf("\nОчередь полная...");
-		return BAD;
+		*err = BAD;
+		return;
 	}
 	q->tasks[q->rear] = task;
 	q->rear = (q->rear+1) % MAX_SIZE;
-	return GOOD;
+	*err = GOOD;
+	return;
 }
 
 Task pop(Queue *q){
 	if (isEmpty(q)){
-		printf("\nОчередь пустая...");
 		Task nothing = {-10, -10, NULL};
 		return nothing;
 	}
@@ -60,18 +57,38 @@ void clear(Queue *q){
 	}
 }
 
-int process(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){
+void process(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3, ERROR *glob_err){
 	Queue *toChannels = malloc(sizeof(Queue)*nOfChnls);
-	Queue *toLeader = malloc(sizeof(Queue)*nOfChnls);
-	if (toChannels == NULL || toLeader == NULL){
-		return BAD;
+	if (toChannels == NULL){
+		*glob_err = BAD_ALLOC;
+		return;
 	}
+	Queue *toLeader = malloc(sizeof(Queue)*nOfChnls);
+	if (toLeader == NULL){
+		free(toChannels);
+		*glob_err = BAD_ALLOC;
+		return;
+	}
+	ERROR *err = malloc(sizeof(ERROR));
+	if (err == NULL){
+		*glob_err = BAD_ALLOC;
+		free(toChannels);
+		free(toLeader);
+		return;
+	}
+	*err = GOOD;
 	for (int i = 0; i < nOfChnls; i++) {
 		init(&toChannels[i]);
 		init(&toLeader[i]);
 	}
 	int nOfAngles = ang2 - ang1 + 1;
 	Task *res = malloc(sizeof(Task)*nOfAngles);
+	if (res == NULL){
+		*glob_err = BAD_ALLOC;
+		free(toLeader);
+		free(toChannels);
+		free(err);
+		}
 	for (int i = 0; i < nOfAngles; i++){
 		res[i].ang = ang1 + i;
 		res[i].res = -10;
@@ -86,8 +103,9 @@ int process(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){
 				double randomvalue = (double)rand() / RAND_MAX;
 				if (randomvalue < p1 && isEmpty(&toChannels[i])) {
 					Task task = {res[j].ang, 0, NULL};
-					if (put(&toChannels[i], task) == GOOD){break;}
-					else{goto brk;}
+					put(&toChannels[i], task, err);
+					if (*err  == GOOD){break;}
+					goto brk;
 				}
 			}
 		}
@@ -97,7 +115,8 @@ int process(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){
 			if (randomvalue < p2){
 				Task task = pop(&toChannels[i]);
 				task.res = calcSin(task.ang);
-				if (put(&toLeader[i], task) == BAD){goto brk;}
+				put(&toLeader[i], task, err);
+				if (*err == BAD){goto brk;}
 			}
 		}
 		for (int i = 0; i < nOfChnls; i++) {
@@ -128,5 +147,7 @@ int process(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){
 	free(res);
 	free(toLeader);
 	free(toChannels);
+	free(err);
+	*glob_err = GOOD;
 }
 

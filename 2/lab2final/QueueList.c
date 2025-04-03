@@ -1,7 +1,5 @@
 #include "all.h"
 
-#define BAD -2
-#define GOOD 0
 
 struct Task{
 	int ang;
@@ -29,10 +27,11 @@ void init(Queue *q){
 	q->rear = NULL;
 }
 
-int put(Queue *q, Task task){
+void put(Queue *q, Task task, ERROR *err){
 	Task *new = (Task *)malloc(sizeof(Task));
 	if (new == NULL){
-		return BAD;
+		*err = BAD_ALLOC;
+		return;
 	}
 	new->ang = task.ang;
 	new->res = task.res;
@@ -40,18 +39,22 @@ int put(Queue *q, Task task){
 
 	if (isEmpty(q)){
 		q->front = q->rear = new;
-		return GOOD;
+		*err = GOOD;
+		return;
 	}
 	q->rear->next = new;
 	q->rear = new;
-	return GOOD;
+	*err = GOOD;
+	return;
 }
 
-Task pop(Queue *q){
+Task pop(Queue *q, ERROR *err){
 	if (isEmpty(q)){
 		printf("\nОчередь пустая...");
-		Task nothing = {-10, -10, NULL};
-		return nothing;
+		*err = QUEUE_EMPTY;
+		// Task nothing = {-10, -10, NULL};
+		// return nothing;
+		return NULL;
 	}
 	Task *tmp = q->front;
 	Task task = *tmp;
@@ -75,6 +78,8 @@ int process(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){
 	if (toChannels == NULL || toLeader == NULL){
 		return BAD;
 	}
+	ERROR *err = malloc(sizeof(ERROR));
+	*err = GOOD;
 	for (int i = 0; i < nOfChnls; i++) {
 		init(&toChannels[i]);
 		init(&toLeader[i]);
@@ -95,8 +100,8 @@ int process(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){
 				double randomvalue = (double)rand() / RAND_MAX;
 				if (randomvalue < p1 && isEmpty(&toChannels[i])) {
 					Task task = {res[j].ang, 0, NULL};
-					if (put(&toChannels[i], task) == GOOD){break;}
-					else{goto brk;}
+					if (put(&toChannels[i], task, err) == GOOD){break;}
+					goto brk;
 				}
 			}
 		}
@@ -104,14 +109,14 @@ int process(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3){
 			if (isEmpty(&toChannels[i])) continue;
 			double randomvalue = (double)rand() / RAND_MAX;
 			if (randomvalue < p2){
-				Task task = pop(&toChannels[i]);
+				Task task = pop(&toChannels[i], err);
 				task.res = calcSin(task.ang);
-				if (put(&toLeader[i], task) == BAD){goto brk;}
+				if (put(&toLeader[i], task, err) == BAD){goto brk;}
 			}
 		}
 		for (int i = 0; i < nOfChnls; i++) {
 			while (!isEmpty(&toLeader[i])){
-				Task task = pop(&toLeader[i]);
+				Task task = pop(&toLeader[i], err);
 				double randomvalue = (double)rand() / RAND_MAX;
 				if (randomvalue < p3){
 					for (int j = 0; j < nOfAngles; j++) {

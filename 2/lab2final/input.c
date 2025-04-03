@@ -6,10 +6,6 @@
 #include "all.h"
 
 
-#define INV "Введите через пробел: кол-во ведомых узлов, угол1, угол2 и вероятности p1, p2, p3:\n"
-#define EXIT -10
-#define BAD -2
-#define GOOD 0
 #define CHNLS 0
 #define DEG1 1
 #define DEG2 2
@@ -20,32 +16,41 @@
 #define DELTA 1.0
 
 
-int input(int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *p3){
+void input(int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *p3, ERROR *glob_err){
 	char *inp = readline(INV);
 	if (inp == NULL){
-		printf("\nexiting///");
 		free(inp);
-		return EXIT;
+		*glob_err = EXIT;
+		return;
 	}
-	int chck = check_Line(inp, nOfChnls, ang1, ang2, p1, p2, p3);
-	while (chck	!= GOOD){
+	ERROR *err = malloc(sizeof(ERROR));
+	if (err == NULL){
+		*glob_err = BAD_ALLOC;
+		return;
+	}
+	*err = GOOD;
+	check_Line(inp, nOfChnls, ang1, ang2, p1, p2, p3, err);
+	while (*err != GOOD){
 		printf("\nНекорректный формат, попробуйте ещё раз:\n");
 		free(inp);
 		inp = readline(INV);
 		if (inp == NULL){
-			printf("\nexiting///");
-			return EXIT;
+			free(err);
+			*glob_err = EXIT;
+			return;
 		}
-		chck = check_Line(inp, nOfChnls, ang1, ang2, p1, p2, p3);
+		check_Line(inp, nOfChnls, ang1, ang2, p1, p2, p3, err);
 	}
+	free(err);
 	free(inp);
-	return GOOD;
+	*glob_err = GOOD;
 }
 
 
-int check_Line(char *str, int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *p3){
+void check_Line(char *str, int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *p3, ERROR *err){
 	if (str[0] == '\0'){
-		return BAD;
+		*err = BAD;
+		return;
 	}
 	char *srk = strdup(str);
 	char *token = strtok(srk, " ");
@@ -54,78 +59,91 @@ int check_Line(char *str, int *nOfChnls, int *ang1, int *ang2, double *p1, doubl
 		if (cntr == CHNLS){
 			if (check_Number(token) == false){
 				free(srk);
-				return BAD;
+				*err = BAD;
+				return;
 			}
 			double f = atof(token);
 			if (isInteger(f) == false){
 				free(srk);
-				return BAD;
+				*err = BAD;
+				return;
 			}
 			*nOfChnls = (int)f;
 		}
 		else if (cntr == DEG1){
 			if (check_Number(token) == false){
 				free(srk);
-				return BAD;
+				*err = BAD;
+				return;
 			}
 			double f = atof(token);
 			if (isInteger(f) == false){
 				free(srk);
-				return BAD;
+				*err = BAD;
+				return;
 			}
 			*ang1 = (int)f;
 		}
 		else if (cntr == DEG2){
 			if (check_Number(token) == false){
 				free(srk);
-				return BAD;
+				*err = BAD;
+				return;
 			}
 			double f = atof(token);
 			if ((isInteger(f) == false) || (f < *ang1) || (f < 0)){
 				free(srk);
-				return BAD;
+				*err = BAD;
+				return;
 			}
 			*ang2 = (int)f;
 		}
 		else if(cntr == POS1){
 			if (check_Number(token) == false){
 				free(srk);
-				return BAD;
+				*err = BAD;
+				return;
 			}
 			double f = atof(token);
 			if ((f < EPSILON) || (f > DELTA)){
 				free(srk);
-				return BAD;
+				*err = BAD;
+				return;
 			}
 			*p1 = f;
 		}
 		else if(cntr == POS2){
 			if (check_Number(token) == false){
 				free(srk);
-				return BAD;
+				*err = BAD;
+				return;
 			}
 			double f = atof(token);
 			if ((f < EPSILON) || (f > DELTA)){
 				free(srk);
-				return BAD;
+				*err = BAD;
+				return;
 			}
 			*p2 = f;
 		}
 		else if(cntr == POS3){
 			if (check_Number(token) == false){
 				free(srk);
-				return BAD;
+				*err = BAD;
+				return;
 			}
 			double f = atof(token);
 			if ((f < EPSILON) || (f > DELTA)){
 				free(srk);
-				return BAD;
+				*err = BAD;
+				return;
 			}
 			*p3 = f;
 		}
 		else if(cntr > POS3){
 			free(srk);
-			return BAD;
+			*err = BAD;
+			return;
 		}
 		token = strtok(NULL, " ");	
 		cntr++;		
@@ -133,36 +151,37 @@ int check_Line(char *str, int *nOfChnls, int *ang1, int *ang2, double *p1, doubl
 	if (cntr <= POS3){
 		free(srk);
 		free(token);
-		return BAD;
+		*err = BAD;
+		return;
 	}
 	free(srk);
 	free(token);
-	return GOOD;
+	*err = GOOD;
 }
 
 
 
-int check_N(char *text){
-	if (text == NULL){
-		return EXIT;
-	}
-	int slen = strlen(text);
-	int OK_notOK = 0;
-	if (slen == 0){
-		OK_notOK = BAD;
-		return OK_notOK;
-	}
-	for (int i=0; i < slen; i++){
-		if (!(isdigit(text[i]))){
-			OK_notOK = BAD;
-			return OK_notOK;
-		}
-	}
-	if (*text == '0'){
-		OK_notOK = BAD;
-	}
-	return OK_notOK;
-}
+// void check_N(char *text, ERROR *err){
+// 	if (text == NULL){
+// 		*err = EXIT;
+// 		return;
+// 	}
+// 	*err = GOOD;
+// 	int slen = strlen(text);
+// 	if (slen == 0){
+// 		*err = BAD;
+// 		return;
+// 	}
+// 	for (int i=0; i < slen; i++){
+// 		if (!(isdigit(text[i]))){
+// 			*err = BAD;
+// 			return;
+// 		}
+// 	}
+// 	if (*text == '0'){
+// 		*err = BAD;
+// 	}
+// }
 
 
 

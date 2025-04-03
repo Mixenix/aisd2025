@@ -1,33 +1,44 @@
 #include "all.h"
 
-#define GOOD 0
-#define BAD -2
-#define EXIT -10
-#define INV "Введите через пробел кол-во ведомых узлов, угол1, угол2 и вероятности p1, p2, p3:\n"
+
+
 
 int main(){
 	int nOfChnls;
 	int ang1;
 	int ang2;
 	double p1, p2, p3;
+	int realtype = typeOstuff();
 	int inp = GOOD;
-	while (inp != EXIT) {
-		int realtype = typeOstuff();
-		inp = input(&nOfChnls, &ang1, &ang2, &p1, &p2, &p3);
-		if (inp == EXIT) return 0;
+	ERROR *glob_err = malloc(sizeof(ERROR));
+	*glob_err = GOOD;
+	while (*glob_err != EXIT) {
 		switch (realtype){
 		case 0:
-			printf("\nНа списке");
+			printf("\nНа списке\n");
 			break;
 		case 1:
-			printf("\nНа массиве");
-			break;			
+			printf("\nНа векторе\n");
+			break;		
 		}
-		if (process(nOfChnls, ang1, ang2, p1, p2, p3) == BAD){
-			printf("\nerror, exit...");
+		if (*glob_err == BAD_ALLOC){
+			printf("\nBad alloc, exiting...");
+			free(glob_err);
+			return 1;
+		}
+		input(&nOfChnls, &ang1, &ang2, &p1, &p2, &p3, glob_err);
+		if (*glob_err == EXIT){
+			free(glob_err);
+			return 0;
+		}
+		process(nOfChnls, ang1, ang2, p1, p2, p3, glob_err);
+		if (*glob_err == BAD_ALLOC){
+			printf("\nBad alloc, exiting...");
+			free(glob_err);
 			return 1;
 		}
 	}
+	free(glob_err);
     return 0;
 }
 
