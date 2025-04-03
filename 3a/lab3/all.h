@@ -41,6 +41,7 @@ struct Table {
 
 #ifndef ALL_H
 #define ALL_H
+Table *tbl_init(int csize, int msize);
 bool check_Number(char *text);
 bool isInteger(double N);
 int input(int *action, char *INV);
@@ -48,6 +49,7 @@ char *readtxtline(FILE *f);
 Table *readTableFromFile(char *filename);
 Table* searchAllByKey(Table* tablePtr, char* keyToFind);
 char *searchByKeyAndRelease(Table *tbl, char *keyToFind, int relToFind);
+void befree(Table *resultTable);
 int removeByKey(Table *tbl, char *keyToDel);
 int removeByKeyAndRelease(Table *tbl, char *keyToDel, int RelToDel);
 #endif

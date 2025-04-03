@@ -5,19 +5,11 @@ Table *readTableFromFile(char *filename){
     FILE *file = fopen(filename, "r");
     if (!file) return NULL;
 
-    Table* table = malloc(sizeof(Table));
-    if (!table) {
-        fclose(file);
-        return NULL;
-    }
-
-    table->msize = 10;
-    table->csize = 0;
-    table->ks = calloc(table->msize, sizeof(KeySpace));
-    if (!table->ks) {
-        free(table);
-        fclose(file);
-        return NULL;
+	Table *table = tbl_init(0, 10);
+    if (table == NULL){
+    	printf(ALLOC_ERROR);
+    	fclose(file);
+    	return NULL;
     }
 
     char* line;
@@ -150,6 +142,9 @@ char *readtxtline(FILE *f){
     while( 1 ) { 
         if ( next == cap ) {
             p = realloc( p, cap *= 2 );
+            if (p == NULL){
+            	return NULL;
+            }
         }
         c = fgetc( f ); 
         if ( c == EOF || c == '\n' ) {

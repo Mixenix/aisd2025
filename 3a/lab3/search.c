@@ -1,24 +1,20 @@
 #include "all.h"
 
-char *searchByKeyAndRelease(Table *tbl, char *keyToFind, int relToFind){
-	if (tbl == NULL || tbl->ks == NULL) return NULL;
-	for (int i=0; i<tbl->csize; i++){
-		if (strcmp(tbl->ks[i].key, keyToFind) == 0){
-			Node *elem = tbl->ks[i].node;
-			while (elem != NULL){
-				if (elem->release == relToFind){
-					return strdup(elem->info);
-				}
-				elem = elem->next;
-			}
-		}
-	}
-	return NULL;
+char *searchByKeyAndRelease(Table *tbl, char *keyToFind, int relToFind) {
+    if (tbl == NULL || tbl->ks == NULL) return NULL;
+    for (int i = 0; i < tbl->csize; i++) {
+        if (strcmp(tbl->ks[i].key, keyToFind) == 0) {
+            Node *elem = tbl->ks[i].node;
+            while (elem != NULL) {
+                if (elem->release == relToFind) {
+                    return strdup(elem->info);
+                }
+                elem = elem->next;
+            }
+        }
+    }
+    return NULL;
 }
-
-
-
-
 
 Table *searchAllByKey(Table* tbl, char* keyToFind) {
     if (tbl == NULL || keyToFind == NULL) return NULL;
@@ -53,31 +49,38 @@ Table *searchAllByKey(Table* tbl, char* keyToFind) {
     }
 
     Node* srcNode = foundKS->node;
-    Node** dstNode = &(resultTable->ks[0].node);
-    *dstNode = NULL;
+    Node* prevNode = NULL;
+    Node* firstNode = NULL;
     int error = 0;
 
     while (srcNode && !error) {
-        *dstNode = malloc(sizeof(Node));
-        if (!*dstNode) {
+        Node* newNode = malloc(sizeof(Node));
+        if (!newNode) {
             error = 1;
             break;
         }
 
-        (*dstNode)->release = srcNode->release;
-        (*dstNode)->info = strdup(srcNode->info);
-        if (!(*dstNode)->info) {
-            free(*dstNode);
+        newNode->release = srcNode->release;
+        newNode->info = strdup(srcNode->info);
+        if (!newNode->info) {
+            free(newNode);
             error = 1;
             break;
         }
 
-        dstNode = &((*dstNode)->next);
+        newNode->next = NULL;
+
+        if (prevNode) {
+            prevNode->next = newNode;
+        } else {
+            firstNode = newNode;
+        }
+        prevNode = newNode;
         srcNode = srcNode->next;
     }
 
     if (error) {
-        Node* curr = resultTable->ks[0].node;
+        Node* curr = firstNode;
         while (curr) {
             Node* next = curr->next;
             free(curr->info);
@@ -90,6 +93,21 @@ Table *searchAllByKey(Table* tbl, char* keyToFind) {
         return NULL;
     }
 
-    *dstNode = NULL;
+    resultTable->ks[0].node = firstNode;
     return resultTable;
+}
+
+void befree(Table *resultTable) {
+    if (!resultTable) return;
+    
+    Node* curr = resultTable->ks[0].node;
+    while (curr) {
+        Node* next = curr->next;
+        free(curr->info);
+        free(curr);
+        curr = next;
+    }
+    free(resultTable->ks[0].key);
+    free(resultTable->ks);
+    free(resultTable);
 }

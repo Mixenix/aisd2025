@@ -6,15 +6,8 @@ void freedom(Table *tbl);
 
 
 int main() {
-	Table *tbl = malloc(sizeof(Table));
+	Table *tbl = tbl_init(0, 0);
 	if (tbl == NULL){
-		printf(ALLOC_ERROR);
-		return 1;
-	}
-	tbl->msize = 0;
-	tbl->csize = 0;
-	tbl->ks = calloc(tbl->msize, sizeof(KeySpace));
-	if (tbl->ks == NULL){
 		printf(ALLOC_ERROR);
 		return 1;
 	}
@@ -25,7 +18,7 @@ int main() {
 	while (inp != EXIT){
 		int *action = calloc(1, sizeof(int));
 		if (action == NULL){
-			print(ALLOC_ERROR);
+			printf(ALLOC_ERROR);
 			freedom(tbl);
 			return 1;
 		}
@@ -220,6 +213,23 @@ int main() {
 	printTable(tbl);
 	freedom(tbl);
 	return 0;
+}
+
+Table *tbl_init(int csize, int msize){
+	Table *tbl = malloc(sizeof(Table));
+	if (tbl == NULL){
+		printf(ALLOC_ERROR);
+		return NULL;
+	}
+	tbl->msize = msize;
+	tbl->csize = csize;
+	tbl->ks = calloc(tbl->msize, sizeof(KeySpace));
+	if (tbl->ks == NULL){
+		printf(ALLOC_ERROR);
+		free(tbl);
+		return NULL;
+	}
+	return tbl;
 }
 
 int insert(Table *tbl, char *keyToInsertTo, char* infoToInsert) {
