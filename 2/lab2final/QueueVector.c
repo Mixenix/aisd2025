@@ -3,7 +3,6 @@
 struct Task{
 	int ang;
 	double res;
-	Task *next;
 };
 
 struct Queue{
