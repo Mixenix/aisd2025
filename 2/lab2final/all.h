@@ -27,7 +27,6 @@ bool isFull(Queue *q);
 void put(Queue *q, Task task, ERROR *err);
 void clear(Queue *q);
 Task pop(Queue *q);
-int typeOstuff();
 void process(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3, ERROR *glob_err);
 #endif
 

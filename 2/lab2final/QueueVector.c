@@ -1,18 +1,16 @@
 #include "all.h"
 
-struct Task{
+typedef struct Task{
 	int ang;
 	double res;
-};
+	Task *next;
+} Task;
 
-struct Queue{
+typedef struct Queue{
 	Task tasks[MAX_SIZE];
 	int front;
 	int rear;
-};
-
-
-int typeOstuff(){return 1;} // 0 - list, 1 - vector
+} Queue;
 
 
 void init(Queue *q){
@@ -57,6 +55,7 @@ void clear(Queue *q){
 }
 
 void process(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3, ERROR *glob_err){
+	printf("\nНа векторе\n");
 	Queue *toChannels = malloc(sizeof(Queue)*nOfChnls);
 	if (toChannels == NULL){
 		*glob_err = BAD_ALLOC;
@@ -103,6 +102,9 @@ void process(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3, 
 				if (randomvalue < p1 && isEmpty(&toChannels[i])) {
 					Task task = {res[j].ang, 0, NULL};
 					put(&toChannels[i], task, err);
+					if (*err == BAD_ALLOC){
+                   		*glob_err = BAD_ALLOC;
+                   	}
 					if (*err  == GOOD){break;}
 					goto brk;
 				}
@@ -115,6 +117,10 @@ void process(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3, 
 				Task task = pop(&toChannels[i]);
 				task.res = calcSin(task.ang);
 				put(&toLeader[i], task, err);
+				if (*err == BAD_ALLOC){
+					*glob_err = BAD_ALLOC;
+              		goto brk;
+              	}
 				if (*err == BAD){goto brk;}
 			}
 		}
@@ -147,6 +153,6 @@ void process(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3, 
 	free(toLeader);
 	free(toChannels);
 	free(err);
+	if (*glob_err == BAD_ALLOC){return;}
 	*glob_err = GOOD;
 }
-

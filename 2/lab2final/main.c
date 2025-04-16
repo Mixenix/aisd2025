@@ -8,19 +8,10 @@ int main(){
 	int ang1;
 	int ang2;
 	double p1, p2, p3;
-	int realtype = typeOstuff();
 	int inp = GOOD;
 	ERROR *glob_err = malloc(sizeof(ERROR));
 	*glob_err = GOOD;
 	while (*glob_err != EXIT) {
-		switch (realtype){
-		case 0:
-			printf("\nНа списке\n");
-			break;
-		case 1:
-			printf("\nНа векторе\n");
-			break;		
-		}
 		if (*glob_err == BAD_ALLOC){
 			printf("\nBad alloc, exiting...");
 			free(glob_err);
@@ -41,5 +32,7 @@ int main(){
 	free(glob_err);
     return 0;
 }
+
+
 
 

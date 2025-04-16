@@ -31,7 +31,7 @@ void input(int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *
 	*err = GOOD;
 	check_Line(inp, nOfChnls, ang1, ang2, p1, p2, p3, err);
 	while (*err != GOOD){
-		printf("\nНекорректный формат, попробуйте ещё раз:\n");
+		printf("\nНекорректный формат, попробуйте ещё раз (или bad alloc!):\n");
 		free(inp);
 		inp = readline(INV);
 		if (inp == NULL){
@@ -53,7 +53,16 @@ void check_Line(char *str, int *nOfChnls, int *ang1, int *ang2, double *p1, doub
 		return;
 	}
 	char *srk = strdup(str);
+	if (srk == NULL){
+		*err = BAD_ALLOC;
+		return;
+	}
 	char *token = strtok(srk, " ");
+	if (token == NULL){
+		*err = BAD_ALLOC;
+		free(srk);
+		return;
+	}
 	int cntr = 0;
 	while (token != NULL){
 		if (cntr == CHNLS){
@@ -159,34 +168,6 @@ void check_Line(char *str, int *nOfChnls, int *ang1, int *ang2, double *p1, doub
 	*err = GOOD;
 }
 
-
-
-// void check_N(char *text, ERROR *err){
-// 	if (text == NULL){
-// 		*err = EXIT;
-// 		return;
-// 	}
-// 	*err = GOOD;
-// 	int slen = strlen(text);
-// 	if (slen == 0){
-// 		*err = BAD;
-// 		return;
-// 	}
-// 	for (int i=0; i < slen; i++){
-// 		if (!(isdigit(text[i]))){
-// 			*err = BAD;
-// 			return;
-// 		}
-// 	}
-// 	if (*text == '0'){
-// 		*err = BAD;
-// 	}
-// }
-
-
-
-
-
 bool check_Number(char *text) {
     if (text == NULL || text[0] == '\0') {
         return false;
@@ -219,9 +200,5 @@ bool check_Number(char *text) {
 
 
 bool isInteger(double N){
-    int X = N;
- 
-    double temp2 = N - X;
-
- 	return temp2 < EPSILON;
+ 	return N - (int)N < EPSILON;
 }
