@@ -1,27 +1,27 @@
 #include "all.h"
 
-static int hash(unsigned int key, int msize) {
+static unsigned long long hash(unsigned int key, int msize) {
 	unsigned char *bytes = (unsigned char *)&key;
-	int hash_value = 0;
+	unsigned long long h = INT_MAX;
 	
-	for (int i = 0; i < sizeof(unsigned int); i++) {
-		hash_value += bytes[i];
+	for (long unsigned int i = 0; i < sizeof(unsigned int); i++) {
+		h = h*97 +bytes[i];
 	}
-	
-	return hash_value % msize;
+
+	return h;
 }
 
 Table *init(int msize, ERROR *err) {
+	if (msize == 0){
+		*err = BAD;
+		return NULL;
+	}
 	Table *res = malloc(sizeof(Table));
 	if (res == NULL){
 		*err = BAD_ALLOC;
 		return NULL;
 	}
-	if (msize == 0){
-		free(res);
-		*err = BAD;
-		return NULL;
-	}
+	
 
 	res->ks = (KeySpace *)calloc(msize, sizeof(KeySpace));
 	if (!res->ks){
@@ -53,7 +53,7 @@ void insert(Table *tbl, unsigned int key, unsigned int info, ERROR *err) {
 		*err = BAD;
 		return;
 	}
-	if ((double)tbl->csize / tbl->msize >= 0.7) {
+	if ((double)tbl->csize / tbl->msize >= SIZE_PERCENTAGE) {
 		ERROR *err2 = malloc(sizeof(ERROR));
 		if (err2 == NULL){
 			*err = BAD_ALLOC;
@@ -69,7 +69,7 @@ void insert(Table *tbl, unsigned int key, unsigned int info, ERROR *err) {
 		free(err2);
 	}
 	
-	int index = hash(key, tbl->msize);
+	int index = hash(key, tbl->msize) % tbl->msize;
 	int release = 1;
 	
 	while (tbl->ks[index].busy == USED && tbl->ks[index].key != key) {

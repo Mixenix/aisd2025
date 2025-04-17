@@ -76,242 +76,36 @@ int main() {
 		
 		switch ((int)*action) {
 			case 0:
-				inpT = input(tmp, "\nВведите ключ для вставки: ", KEY);
-				while (inpT != GOOD || *tmp < 0){
-					if (inpT == EXIT){
-						free(tmp);
-						free(tmp2);
-						free(action);
-						tbl_free(tbl);
-						free(glob_err);
-						return 0;
-					}
-					inpT = input(tmp, "\nВведите ключ для вставки: ", KEY);
-				}
-				inpT = input(tmp2, "\nВведите значение для вставки: ", INFO);
-				while (inpT != GOOD || *tmp < 0){
-					if (inpT == EXIT){
-						free(tmp);
-						free(tmp2);
-						free(action);
-						tbl_free(tbl);
-						free(glob_err);
-						return 0;
-					}
-					inpT = input(tmp2, "\nВведите значение для вставки: ", INFO);
-				}
-				*glob_err = GOOD;
-				insert(tbl, (unsigned int)*tmp, (unsigned int)*tmp2, glob_err);
-				switch (*glob_err){
-					case BAD:
-						printf("Вставка нот гуд\n");
-						break;
-					case GOOD:
-						printf("Вставка гуд\n");
-						break;
-					case BAD_ALLOC:
-						printf(BAD_ALLOC_MESSAGE);
-						tbl_free(tbl);
-						free(glob_err);
-						free(action);
-						return 1;
-				}
+				int ins = insertion(tbl, action, tmp, tmp2, glob_err);
+				if (ins == EXIT || ins == BAD_ALLOC){return ins;}
 				break;
 				
 			case 1:
-				inpT = input(tmp, "\nВведие ключ для удаления: ", KEY);
-				while (inpT != GOOD || *tmp < 0){
-					if (inpT == EXIT){
-						free(tmp);
-						free(tmp2);
-						free(action);
-						tbl_free(tbl);
-						free(glob_err);
-						return 0;
-					}
-					inpT = input(tmp, "\nВведите ключ для удаления: ", KEY);
-				}
-				
-				*glob_err = GOOD;
-				elem_remove(tbl, (unsigned int)*tmp, -1, glob_err);
-				if (*glob_err != BAD) {
-					printf("Элемент(ы) удален(ы)\n");
-				} else {
-					printf("Элемент(ы) не найден(ы)\n");
-				}
+				int rm = removal(tbl, action, tmp, tmp2, glob_err);
+				if (rm == EXIT){return rm;}
 				break;
 			case 2:
-				inpT = input(tmp, "\nВведие ключ для удаления: ", KEY);
-				while (inpT != GOOD || *tmp < 0){
-					if (inpT == EXIT){
-						free(tmp);
-						free(tmp2);
-						free(action);
-						tbl_free(tbl);
-						free(glob_err);
-						return 0;
-					}
-					inpT = input(tmp, "\nВведите ключ для удаления: ", KEY);
-				}
-				inpT = input(tmp2, "\nВведите версию для удаления: ", REL);
-				while (inpT != GOOD || *tmp < 0){
-					if (inpT == EXIT){
-						free(tmp);
-						free(tmp2);
-						free(action);
-						tbl_free(tbl);
-						free(glob_err);
-						return 0;
-					}
-					inpT = input(tmp2, "\nВведите версию для удаления: ", REL);
-				}
-				*glob_err = GOOD;
-				elem_remove(tbl, (unsigned int)*tmp, (int)*tmp2, glob_err);
-				if (*glob_err != BAD) {
-					printf("Элемент(ы) удален(ы)\n");
-				} else {
-					printf("Элемент(ы) не найден(ы)\n");
-				}
+				int rmbyver = removalByVersion(tbl ,action, tmp, tmp2, glob_err);
+				if (rmval == EXIT){return rmval;}
 				break;
 
 			case 3:
-				inpT = input(tmp, "\nВведие ключ для поиска: ", KEY);
-				while (inpT != GOOD || *tmp < 0){
-					if (inpT == EXIT){
-						free(tmp);
-						free(tmp2);
-						free(action);
-						tbl_free(tbl);
-						free(glob_err);
-						return 0;
-					}
-					inpT = input(tmp, "\nВведите ключ для поиска: ", KEY);
-				}
-				
-				int all_count;
-				*glob_err = GOOD;
-				KeySpace *all_results = search_all_versions(tbl, (unsigned int)*tmp, &all_count, glob_err);
-
-				if (*glob_err == BAD_ALLOC){
-					printf(BAD_ALLOC_MESSAGE);
-					tbl_free(tbl);
-					free(glob_err);
-					return 1;
-				}
-				
-				if (*glob_err != NOT_FOUND) {
-					printf("Найдено %d версий:\n", all_count);
-					for (int i = 0; i < all_count; i++) {
-						printf("  Версия: %d, Значение: %u\n",
-						       all_results[i].release, *(all_results[i].info));
-					}
-					free_search_results(all_results, all_count);
-				} else {
-					printf("Элементы не найдены\n");
-				}
+				int srch = srch(tbl, action, tmp, tmp2, glob_err);
+				if (srch == EXIT || srch == BAD_ALLOC){return srch;}
 				break;
 			case 4:
-				inpT = input(tmp, "\nВведие ключ для поиска: ", KEY);
-				while (inpT != GOOD || *tmp < 0){
-					if (inpT == EXIT){
-						free(tmp);
-						free(tmp2);
-						free(action);
-						tbl_free(tbl);
-						free(glob_err);
-						return 0;
-					}
-					inpT = input(tmp, "\nВведите ключ для поиска: ", KEY);
-				}
-				inpT = input(tmp2, "\nВведите версию для поиска: ", REL);
-				while (inpT != GOOD || *tmp < 0){
-					if (inpT == EXIT){
-						free(tmp);
-						free(tmp2);
-						free(action);
-						tbl_free(tbl);
-						free(glob_err);
-						return 0;
-					}
-					inpT = input(tmp2, "\nВведите версию для поиска: ", REL);
-				}
-				
-				int count;
-				*glob_err = GOOD;
-				KeySpace *results = search(tbl, (unsigned int)*tmp, (int)*tmp2, &count, glob_err);
-
-				if (*glob_err == BAD_ALLOC){
-					printf(BAD_ALLOC_MESSAGE);
-					tbl_free(tbl);
-					free(glob_err);
-					return 1;
-				}
-				if (*glob_err != NOT_FOUND) {
-					printf("Найдено %d элементов:\n", count);
-					for (int i = 0; i < count; i++) {
-						printf("  Ключ: %u, Версия: %d, Инфо: %u\n",
-						       results[i].key, results[i].release, *(results[i].info));
-					}
-					free_search_results(results, count);
-				} else{
-					printf("Элемент не найден\n");
-				}
+				int srchbyver = srchByVersion(tbl, action, tmp, tmp2, glob_err);
+				if (srchbyver == EXIT || srchbyver == BAD_ALLOC){return srchbyver;}
 				break;
 				
 			case 5:
-				char *filename = readline("\nВведите имя файла для импорта: ");
-				if (filename == NULL){
-					free(tmp);
-					free(tmp2);
-					tbl_free(tbl);
-					free(action);
-					free(glob_err);
-					return 0;
-				}
-
-				*glob_err = GOOD;
-				import(tbl, filename, glob_err);
-				switch (*glob_err){
-					case BAD_FORMAT:
-						printf("\nНеверный формат файла");
-						break;
-					case NOT_FOUND_FILE:
-						printf("\nФайл не найден");
-						break;
-					case BAD_ALLOC:
-						printf(BAD_ALLOC_MESSAGE);
-						tbl_free(tbl);
-						free(glob_err);
-						return 1;
-					case BAD:
-						break;
-				}
+				int imp = flImport(tbl, action, tmp, tmp2, glob_err);
+				if (imp == EXIT || imp == BAD_ALLOC){return imp;}
 				break;
 				
 			case 6:
-				filename = readline("\nВведите имя файла для экспорта: ");
-				if (filename == NULL){
-					free(tmp);
-					free(tmp2);
-					tbl_free(tbl);
-					free(action);
-					free(glob_err);
-					return 0;
-				}
-
-				*glob_err = GOOD;
-				export(tbl, filename, glob_err);
-				switch (*glob_err){
-					case GOOD:
-						printf("\nЭкспорт гуд");
-						break;
-					case FAILED_TO_CREATE_FILE:
-						printf("\nНе получилось создать выходной файл, ничего не произошло");
-						break;
-					case BAD:
-						printf("\nЭкспорт нот гуд, ничего не произошло");
-						break;
-				}
+				int exp = flExport(tbl, action, tmp, tmp2, glob_err);
+				if (exp == EXIT){return exp;}
 				break;
 				
 			case 7:
@@ -329,4 +123,254 @@ int main() {
 		}
 		printTable(tbl);
 	}
+}
+
+int insertion(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
+	int inpT = input(tmp, "\nВведите ключ для вставки: ", KEY);
+	while (inpT != GOOD || *tmp < 0){
+		if (inpT == EXIT){
+			free(tmp);
+			free(tmp2);
+			free(action);
+			tbl_free(tbl);
+			free(glob_err);
+			return EXIT;
+		}
+		inpT = input(tmp, "\nВведите ключ для вставки: ", KEY);
+	}
+	inpT = input(tmp2, "\nВведите значение для вставки: ", INFO);
+	while (inpT != GOOD || *tmp < 0){
+		if (inpT == EXIT){
+			free(tmp);
+			free(tmp2);
+			free(action);
+			tbl_free(tbl);
+			free(glob_err);
+			return EXIT;
+		}
+		inpT = input(tmp2, "\nВведите значение для вставки: ", INFO);
+	}
+	*glob_err = GOOD;
+	insert(tbl, (unsigned int)*tmp, (unsigned int)*tmp2, glob_err);
+	switch (*glob_err){
+		case BAD:
+			printf("Вставка нот гуд\n");
+			break;
+		case GOOD:
+			printf("Вставка гуд\n");
+			break;
+		case BAD_ALLOC:
+			printf(BAD_ALLOC_MESSAGE);
+			tbl_free(tbl);
+			free(glob_err);
+			free(action);
+			return 1;
+	}
+	return GOOD;
+}
+
+int removal(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
+	int inpT = input(tmp, "\nВведите ключ для удаления: ", KEY);
+	while (inpT != GOOD || *tmp < 0){
+		if (inpT == EXIT){
+			free(tmp);
+			free(tmp2);
+			free(action);
+			tbl_free(tbl);
+			free(glob_err);
+			return EXIT;
+		}
+		inpT = input(tmp, "\nВведите ключ для удаления: ", KEY);
+	}
+	
+	*glob_err = GOOD;
+	elem_remove(tbl, (unsigned int)*tmp, -1, glob_err);
+	if (*glob_err != BAD) {
+		printf("Элемент(ы) удален(ы)\n");
+	} else {
+		printf("Элемент(ы) не найден(ы)\n");
+	}
+	return GOOD;
+}
+
+
+int removalByVersion(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
+	int inpT = input(tmp, "\nВведие ключ для удаления: ", KEY);
+	while (inpT != GOOD || *tmp < 0){
+		if (inpT == EXIT){
+			free(tmp);
+			free(tmp2);
+			free(action);
+			tbl_free(tbl);
+			free(glob_err);
+			return EXIT;
+		}
+		inpT = input(tmp, "\nВведите ключ для удаления: ", KEY);
+	}
+	inpT = input(tmp2, "\nВведите версию для удаления: ", REL);
+	while (inpT != GOOD || *tmp < 0){
+		if (inpT == EXIT){
+			free(tmp);
+			free(tmp2);
+			free(action);
+			tbl_free(tbl);
+			free(glob_err);
+			return EXIT;
+		}
+		inpT = input(tmp2, "\nВведите версию для удаления: ", REL);
+	}
+	*glob_err = GOOD;
+	elem_remove(tbl, (unsigned int)*tmp, (int)*tmp2, glob_err);
+	if (*glob_err != BAD) {
+		printf("Элемент(ы) удален(ы)\n");
+	} else {
+		printf("Элемент(ы) не найден(ы)\n");
+	}
+	return GOOD;
+}
+
+int srch(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
+	int inpT = input(tmp, "\nВведите ключ для поиска: ", KEY);
+	while (inpT != GOOD || *tmp < 0){
+		if (inpT == EXIT){
+			free(tmp);
+			free(tmp2);
+			free(action);
+			tbl_free(tbl);
+			free(glob_err);
+			return EXIT;
+		}
+		inpT = input(tmp, "\nВведите ключ для поиска: ", KEY);
+	}
+	
+	int all_count;
+	*glob_err = GOOD;
+	KeySpace *all_results = search_all_versions(tbl, (unsigned int)*tmp, &all_count, glob_err);
+
+	if (*glob_err == BAD_ALLOC){
+		printf(BAD_ALLOC_MESSAGE);
+		tbl_free(tbl);
+		free(glob_err);
+		return BAD_ALLOC;
+	}
+	
+	if (*glob_err != NOT_FOUND) {
+		printf("Найдено %d версий:\n", all_count);
+		for (int i = 0; i < all_count; i++) {
+			printf("  Версия: %d, Значение: %u\n",
+			       all_results[i].release, *(all_results[i].info));
+		}
+		free_search_results(all_results, all_count);
+	} else {
+		printf("Элементы не найдены\n");
+	}
+	return GOOD;
+}
+
+int srchByVersion(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
+	int inpT = input(tmp, "\nВведие ключ для поиска: ", KEY);
+	while (inpT != GOOD || *tmp < 0){
+		if (inpT == EXIT){
+			free(tmp);
+			free(tmp2);
+			free(action);
+			tbl_free(tbl);
+			free(glob_err);
+			return EXIT;
+		}
+		inpT = input(tmp, "\nВведите ключ для поиска: ", KEY);
+	}
+	inpT = input(tmp2, "\nВведите версию для поиска: ", REL);
+	while (inpT != GOOD || *tmp < 0){
+		if (inpT == EXIT){
+			free(tmp);
+			free(tmp2);
+			free(action);
+			tbl_free(tbl);
+			free(glob_err);
+			return EXIT;
+		}
+		inpT = input(tmp2, "\nВведите версию для поиска: ", REL);
+	}
+	
+	int count;
+	*glob_err = GOOD;
+	KeySpace *results = search(tbl, (unsigned int)*tmp, (int)*tmp2, &count, glob_err);
+
+	if (*glob_err == BAD_ALLOC){
+		printf(BAD_ALLOC_MESSAGE);
+		tbl_free(tbl);
+		free(glob_err);
+		return BAD_ALLOC;
+	}
+	if (*glob_err != NOT_FOUND) {
+		printf("Найдено %d элементов:\n", count);
+		for (int i = 0; i < count; i++) {
+			printf("  Ключ: %u, Версия: %d, Инфо: %u\n",
+			       results[i].key, results[i].release, *(results[i].info));
+		}
+		free_search_results(results, count);
+	} else{
+		printf("Элемент не найден\n");
+	}
+	return GOOD;
+}
+
+
+int flImport(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
+	char *filename = readline("\nВведите имя файла для импорта: ");
+	if (filename == NULL){
+		free(tmp);
+		free(tmp2);
+		tbl_free(tbl);
+		free(action);
+		free(glob_err);
+		return EXIT;
+	}
+
+	*glob_err = GOOD;
+	import(tbl, filename, glob_err);
+	switch (*glob_err){
+		case BAD_FORMAT:
+			printf("\nНеверный формат файла");
+			break;
+		case NOT_FOUND_FILE:
+			printf("\nФайл не найден");
+			break;
+		case BAD_ALLOC:
+			printf(BAD_ALLOC_MESSAGE);
+			tbl_free(tbl);
+			free(glob_err);
+			return BAD_ALLOC;
+		case BAD:
+			break;
+	}
+	return GOOD;
+}
+
+int flExport(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
+	filename = readline("\nВведите имя файла для экспорта: ");
+	if (filename == NULL){
+		free(tmp);
+		free(tmp2);
+		tbl_free(tbl);
+		free(action);
+		free(glob_err);
+		return EXIT;
+	}
+
+	*glob_err = GOOD;
+	export(tbl, filename, glob_err);
+	switch (*glob_err){
+		case GOOD:
+			printf("\nЭкспорт гуд");
+			break;
+		case FAILED_TO_CREATE_FILE:
+			printf("\nНе получилось создать выходной файл, ничего не произошло");
+			break;
+		case BAD:
+			printf("\nЭкспорт нот гуд, ничего не произошло");
+			break;
+	}
+	return GOOD;
 }
