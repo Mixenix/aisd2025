@@ -86,12 +86,12 @@ int main() {
 				break;
 			case 2:
 				int rmbyver = removalByVersion(tbl ,action, tmp, tmp2, glob_err);
-				if (rmval == EXIT){return rmval;}
+				if (rmbyver == EXIT){return rmbyver;}
 				break;
 
 			case 3:
-				int srch = srch(tbl, action, tmp, tmp2, glob_err);
-				if (srch == EXIT || srch == BAD_ALLOC){return srch;}
+				int srchh = srch(tbl, action, tmp, tmp2, glob_err);
+				if (srchh == EXIT || srchh == BAD_ALLOC){return srchh;}
 				break;
 			case 4:
 				int srchbyver = srchByVersion(tbl, action, tmp, tmp2, glob_err);
@@ -349,7 +349,7 @@ int flImport(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *
 }
 
 int flExport(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
-	filename = readline("\nВведите имя файла для экспорта: ");
+	char *filename = readline("\nВведите имя файла для экспорта: ");
 	if (filename == NULL){
 		free(tmp);
 		free(tmp2);
