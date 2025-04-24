@@ -1,16 +1,10 @@
-typedef struct Node{
-	char *key;
-	char *info;
-	struct Node *left;
-	struct Node *right;
-	struct Node *parent;
-} Node;
+#include "bin.h"
 
 
-void pre_order_traversal(TreeNode* root) {
+void pre_order_traversal(Node* root) {
     if (root == NULL) return;
     
-    printf("%d ", root->data);
+    printf("%s ", root->info);
     pre_order_traversal(root->left);
     pre_order_traversal(root->right);
 }
