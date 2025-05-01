@@ -54,19 +54,13 @@ void insert(Table *tbl, unsigned int key, unsigned int info, ERROR *err) {
 		return;
 	}
 	if ((double)tbl->csize / tbl->msize >= SIZE_PERCENTAGE) {
-		ERROR *err2 = malloc(sizeof(ERROR));
-		if (err2 == NULL){
+		ERROR err2 = GOOD;
+		
+		resize(tbl, &err2);
+		if (err2 == BAD_ALLOC){
 			*err = BAD_ALLOC;
 			return;
 		}
-		*err2 = GOOD;
-		resize(tbl, err2);
-		if (*err2 == BAD_ALLOC){
-			*err = BAD_ALLOC;
-			free(err2);
-			return;
-		}
-		free(err2);
 	}
 	
 	int index = hash(key, tbl->msize) % tbl->msize;
@@ -220,18 +214,24 @@ void export(Table *tbl, char *filename, ERROR *err) {
 		return;
 	}
 	
-	fwrite(&tbl->msize, sizeof(int), 1, file);
-	fwrite(&tbl->csize, sizeof(int), 1, file);
+	if (fwrite(&tbl->msize, sizeof(int), 1, file) != 1 || fwrite(&tbl->csize, sizeof(int), 1, file) != 1){
+		*err = FAILED_TO_WRITE;
+		fclose(file);
+		return;
+	}
 	
 	for (int i = 0; i < tbl->msize; i++) {
 		if (tbl->ks[i].busy == USED) {
-			fwrite(&tbl->ks[i].busy, sizeof(BusyType), 1, file);
-			fwrite(&tbl->ks[i].key, sizeof(unsigned int), 1, file);
-			fwrite(&tbl->ks[i].release, sizeof(int), 1, file);
-			fwrite(tbl->ks[i].info, sizeof(unsigned int), 1, file);
+			if (fwrite(&tbl->ks[i].busy, sizeof(BusyType), 1, file) != 1 ||
+			fwrite(&tbl->ks[i].key, sizeof(unsigned int), 1, file) != 1 ||
+			fwrite(&tbl->ks[i].release, sizeof(int), 1, file) != 1 ||
+			fwrite(tbl->ks[i].info, sizeof(unsigned int), 1, file) != 1){
+				*err = FAILED_TO_WRITE;
+				fclose(file);
+				return;
+			}
 		}
 	}
-	
 	fclose(file);
 }
 
@@ -257,18 +257,11 @@ void import(Table *tbl, char *filename, ERROR *err) {
 		return;
 	}
 
-	ERROR *err2 = malloc(sizeof(ERROR));
-	if (!err2) {
-		fclose(file);
-		*err = BAD_ALLOC;
-		return;
-	}
-	*err2 = GOOD;
+	ERROR err2 = GOOD;
 
-	Table *new_tbl = init(msize, err2);
-	if (*err2 == BAD_ALLOC) {
+	Table *new_tbl = init(msize, &err2);
+	if (err2 == BAD_ALLOC) {
 		fclose(file);
-		free(err2);
 		*err = BAD_ALLOC;
 		return;
 	}
@@ -280,7 +273,6 @@ void import(Table *tbl, char *filename, ERROR *err) {
 			fread(&ks.release, sizeof(int), 1, file) != 1) {
 			tbl_free(new_tbl);
 			fclose(file);
-			free(err2);
 			*err = BAD_FORMAT;
 			return;
 		}
@@ -290,7 +282,6 @@ void import(Table *tbl, char *filename, ERROR *err) {
 			free(ks.info);
 			tbl_free(new_tbl);
 			fclose(file);
-			free(err2);
 			*err = (!ks.info) ? BAD_ALLOC : BAD_FORMAT;
 			return;
 		}
@@ -304,7 +295,6 @@ void import(Table *tbl, char *filename, ERROR *err) {
 	}
 
 	fclose(file);
-	free(err2);
 
 	KeySpace *old_ks = tbl->ks;
 	int old_msize = tbl->msize;
@@ -354,16 +344,11 @@ void resize(Table *tbl, ERROR *err) {
 	}
 	
 	int new_size = next_prime_size(tbl->msize);
-	ERROR *err2 = malloc(sizeof(ERROR));
-	if (err2 == NULL){
+	ERROR err2 = GOOD;
+	
+	Table *new_tbl = init(new_size, &err2);
+	if (err2 == BAD_ALLOC){
 		*err = BAD_ALLOC;
-		return;
-	}
-	*err2 = GOOD;
-	Table *new_tbl = init(new_size, err2);
-	if (*err2 == BAD_ALLOC){
-		*err = BAD_ALLOC;
-		free(err2);
 		return;
 	}
 	for (int i = 0; i < tbl->msize; i++) {
@@ -388,6 +373,5 @@ void resize(Table *tbl, ERROR *err) {
 	tbl->csize = new_tbl->csize;
 
 	free(new_tbl);
-	free(err2);
 	new_tbl->ks = NULL;
 }

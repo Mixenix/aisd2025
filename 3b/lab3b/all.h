@@ -23,6 +23,7 @@ typedef int ERROR;
 #define NOT_FOUND -5
 #define NOT_FOUND_FILE -6
 #define FAILED_TO_CREATE_FILE -7
+#define FAILED_TO_WRITE -9
 #define BAD_FORMAT -8
 #define EXIT -10
 
@@ -59,13 +60,13 @@ Table *init(int msize, ERROR *err);
 void tbl_free(Table *tbl);
 void insert(Table *tbl, unsigned int key, unsigned int info, ERROR *err); //done
 
-int insertion(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
-int removal(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
-int srch(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
-int removalByVersion(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
-int srchByVersion(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
-int flImport(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
-int flExport(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
+int insertion(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
+int removal(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
+int srch(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
+int removalByVersion(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
+int srchByVersion(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
+int flImport(Table *tbl, ERROR *glob_err);
+int flExport(Table *tbl, ERROR *glob_err);
 
 
 void elem_remove(Table *tbl, unsigned int key, int release, ERROR *err); //done

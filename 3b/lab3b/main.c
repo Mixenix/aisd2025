@@ -12,21 +12,19 @@ void free_search_results(KeySpace *results, int count) {
 
 int main() {
 	int initial_size = 101;
-	ERROR *glob_err = malloc(sizeof(ERROR));
+	ERROR glob_err = GOOD;
 	if (glob_err == NULL){
 		printf(BAD_ALLOC_MESSAGE);
 		return 1;
 	}
-	*glob_err = GOOD;
-	Table *tbl = init(initial_size, glob_err);
-	if (*glob_err == BAD_ALLOC) {
+	glob_err = GOOD;
+	Table *tbl = init(initial_size, &glob_err);
+	if (glob_err == BAD_ALLOC) {
 		printf(BAD_ALLOC_MESSAGE);
-		free(glob_err);
 		return 1;
 	}
-	if (*glob_err == BAD) {
+	if (glob_err == BAD) {
 		printf("\n%d", BAD);
-		free(glob_err);
 		return 1;
 	}
 	
@@ -35,85 +33,58 @@ int main() {
 	unsigned int info;
 	int inp = BAD;
 	int inpT = BAD;
-	unsigned int *tmp;
-	unsigned int *tmp2;
-	tmp = calloc(1, sizeof(unsigned int));
-	if (tmp == NULL){
-		printf(BAD_ALLOC_MESSAGE);
-		tbl_free(tbl);
-		free(glob_err);
-		return 1;
-	}
-	tmp2 = calloc(1, sizeof(unsigned int));
-	if (tmp2 == NULL){
-		printf(BAD_ALLOC_MESSAGE);
-		free(tmp);
-		tbl_free(tbl);
-		free(glob_err);
-		return 1;
-	}
+	unsigned int tmp;
+	unsigned int tmp2;
+	tmp = 0;
+	tmp2 = 0;
 	
-	unsigned int *action = calloc(1, sizeof(unsigned int));
-	if (action == NULL){
-		tbl_free(tbl);
-		free(glob_err);
-		printf(BAD_ALLOC_MESSAGE);
-		return 1;
-	}
+	unsigned int action = 0;
 	while (inp != EXIT) {
-		inp = input(action, MENU, CHOICE);
+		inp = input(&action, MENU, CHOICE);
 		while (inp != GOOD){
 			if (inp == EXIT){
 				tbl_free(tbl);
-				free(glob_err);
-				free(action);
-				free(tmp);
-				free(tmp2);
 				return 0;
 			}
-			inp = input(action, MENU, CHOICE);
+			inp = input(&action, MENU, CHOICE);
 		}
 		
-		switch ((int)*action) {
+		switch ((int)action) {
 			case 0:
-				int ins = insertion(tbl, action, tmp, tmp2, glob_err);
+				int ins = insertion(tbl, &tmp, &tmp2, &glob_err);
 				if (ins == EXIT || ins == BAD_ALLOC){return ins;}
 				break;
 				
 			case 1:
-				int rm = removal(tbl, action, tmp, tmp2, glob_err);
+				int rm = removal(tbl, &tmp, &tmp2, &glob_err);
 				if (rm == EXIT){return rm;}
 				break;
 			case 2:
-				int rmbyver = removalByVersion(tbl ,action, tmp, tmp2, glob_err);
+				int rmbyver = removalByVersion(tbl, &tmp, &tmp2, &glob_err);
 				if (rmbyver == EXIT){return rmbyver;}
 				break;
 
 			case 3:
-				int srchh = srch(tbl, action, tmp, tmp2, glob_err);
+				int srchh = srch(tbl, &tmp, &tmp2, &glob_err);
 				if (srchh == EXIT || srchh == BAD_ALLOC){return srchh;}
 				break;
 			case 4:
-				int srchbyver = srchByVersion(tbl, action, tmp, tmp2, glob_err);
+				int srchbyver = srchByVersion(tbl, &tmp, &tmp2, &glob_err);
 				if (srchbyver == EXIT || srchbyver == BAD_ALLOC){return srchbyver;}
 				break;
 				
 			case 5:
-				int imp = flImport(tbl, action, tmp, tmp2, glob_err);
+				int imp = flImport(tbl, &glob_err);
 				if (imp == EXIT || imp == BAD_ALLOC){return imp;}
 				break;
 				
 			case 6:
-				int exp = flExport(tbl, action, tmp, tmp2, glob_err);
+				int exp = flExport(tbl, &glob_err);
 				if (exp == EXIT){return exp;}
 				break;
 				
 			case 7:
-				free(tmp);
-				free(tmp2);
-				free(action);
 				tbl_free(tbl);
-				free(glob_err);
 				printf("exiting...\n");
 				return 0;
 			default:
@@ -125,15 +96,11 @@ int main() {
 	}
 }
 
-int insertion(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
+int insertion(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
 	int inpT = input(tmp, "\nВведите ключ для вставки: ", KEY);
 	while (inpT != GOOD || *tmp < 0){
 		if (inpT == EXIT){
-			free(tmp);
-			free(tmp2);
-			free(action);
 			tbl_free(tbl);
-			free(glob_err);
 			return EXIT;
 		}
 		inpT = input(tmp, "\nВведите ключ для вставки: ", KEY);
@@ -141,11 +108,7 @@ int insertion(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int 
 	inpT = input(tmp2, "\nВведите значение для вставки: ", INFO);
 	while (inpT != GOOD || *tmp < 0){
 		if (inpT == EXIT){
-			free(tmp);
-			free(tmp2);
-			free(action);
 			tbl_free(tbl);
-			free(glob_err);
 			return EXIT;
 		}
 		inpT = input(tmp2, "\nВведите значение для вставки: ", INFO);
@@ -162,22 +125,16 @@ int insertion(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int 
 		case BAD_ALLOC:
 			printf(BAD_ALLOC_MESSAGE);
 			tbl_free(tbl);
-			free(glob_err);
-			free(action);
 			return 1;
 	}
 	return GOOD;
 }
 
-int removal(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
+int removal(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
 	int inpT = input(tmp, "\nВведите ключ для удаления: ", KEY);
 	while (inpT != GOOD || *tmp < 0){
 		if (inpT == EXIT){
-			free(tmp);
-			free(tmp2);
-			free(action);
 			tbl_free(tbl);
-			free(glob_err);
 			return EXIT;
 		}
 		inpT = input(tmp, "\nВведите ключ для удаления: ", KEY);
@@ -194,15 +151,11 @@ int removal(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *t
 }
 
 
-int removalByVersion(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
+int removalByVersion(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
 	int inpT = input(tmp, "\nВведие ключ для удаления: ", KEY);
 	while (inpT != GOOD || *tmp < 0){
 		if (inpT == EXIT){
-			free(tmp);
-			free(tmp2);
-			free(action);
 			tbl_free(tbl);
-			free(glob_err);
 			return EXIT;
 		}
 		inpT = input(tmp, "\nВведите ключ для удаления: ", KEY);
@@ -210,11 +163,7 @@ int removalByVersion(Table *tbl, unsigned int *action, unsigned int *tmp, unsign
 	inpT = input(tmp2, "\nВведите версию для удаления: ", REL);
 	while (inpT != GOOD || *tmp < 0){
 		if (inpT == EXIT){
-			free(tmp);
-			free(tmp2);
-			free(action);
 			tbl_free(tbl);
-			free(glob_err);
 			return EXIT;
 		}
 		inpT = input(tmp2, "\nВведите версию для удаления: ", REL);
@@ -229,15 +178,11 @@ int removalByVersion(Table *tbl, unsigned int *action, unsigned int *tmp, unsign
 	return GOOD;
 }
 
-int srch(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
+int srch(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
 	int inpT = input(tmp, "\nВведите ключ для поиска: ", KEY);
 	while (inpT != GOOD || *tmp < 0){
 		if (inpT == EXIT){
-			free(tmp);
-			free(tmp2);
-			free(action);
 			tbl_free(tbl);
-			free(glob_err);
 			return EXIT;
 		}
 		inpT = input(tmp, "\nВведите ключ для поиска: ", KEY);
@@ -247,10 +192,9 @@ int srch(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2
 	*glob_err = GOOD;
 	KeySpace *all_results = search_all_versions(tbl, (unsigned int)*tmp, &all_count, glob_err);
 
-	if (*glob_err == BAD_ALLOC){
+	if (glob_err == BAD_ALLOC){
 		printf(BAD_ALLOC_MESSAGE);
 		tbl_free(tbl);
-		free(glob_err);
 		return BAD_ALLOC;
 	}
 	
@@ -267,15 +211,11 @@ int srch(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2
 	return GOOD;
 }
 
-int srchByVersion(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
+int srchByVersion(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
 	int inpT = input(tmp, "\nВведие ключ для поиска: ", KEY);
 	while (inpT != GOOD || *tmp < 0){
 		if (inpT == EXIT){
-			free(tmp);
-			free(tmp2);
-			free(action);
 			tbl_free(tbl);
-			free(glob_err);
 			return EXIT;
 		}
 		inpT = input(tmp, "\nВведите ключ для поиска: ", KEY);
@@ -283,11 +223,7 @@ int srchByVersion(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned 
 	inpT = input(tmp2, "\nВведите версию для поиска: ", REL);
 	while (inpT != GOOD || *tmp < 0){
 		if (inpT == EXIT){
-			free(tmp);
-			free(tmp2);
-			free(action);
 			tbl_free(tbl);
-			free(glob_err);
 			return EXIT;
 		}
 		inpT = input(tmp2, "\nВведите версию для поиска: ", REL);
@@ -300,7 +236,6 @@ int srchByVersion(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned 
 	if (*glob_err == BAD_ALLOC){
 		printf(BAD_ALLOC_MESSAGE);
 		tbl_free(tbl);
-		free(glob_err);
 		return BAD_ALLOC;
 	}
 	if (*glob_err != NOT_FOUND) {
@@ -317,14 +252,10 @@ int srchByVersion(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned 
 }
 
 
-int flImport(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
+int flImport(Table *tbl, ERROR *glob_err){
 	char *filename = readline("\nВведите имя файла для импорта: ");
 	if (filename == NULL){
-		free(tmp);
-		free(tmp2);
 		tbl_free(tbl);
-		free(action);
-		free(glob_err);
 		return EXIT;
 	}
 
@@ -340,7 +271,6 @@ int flImport(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *
 		case BAD_ALLOC:
 			printf(BAD_ALLOC_MESSAGE);
 			tbl_free(tbl);
-			free(glob_err);
 			return BAD_ALLOC;
 		case BAD:
 			break;
@@ -348,14 +278,10 @@ int flImport(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *
 	return GOOD;
 }
 
-int flExport(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err){
+int flExport(Table *tbl, ERROR *glob_err){
 	char *filename = readline("\nВведите имя файла для экспорта: ");
 	if (filename == NULL){
-		free(tmp);
-		free(tmp2);
 		tbl_free(tbl);
-		free(action);
-		free(glob_err);
 		return EXIT;
 	}
 
@@ -367,6 +293,9 @@ int flExport(Table *tbl, unsigned int *action, unsigned int *tmp, unsigned int *
 			break;
 		case FAILED_TO_CREATE_FILE:
 			printf("\nНе получилось создать выходной файл, ничего не произошло");
+			break;
+		case FAILED_TO_WRITE:
+			printf("\nНе удалось записать в файл");
 			break;
 		case BAD:
 			printf("\nЭкспорт нот гуд, ничего не произошло");
