@@ -10,7 +10,7 @@
 #define MAX_INPUT_LENGTH 4000
 #define EPSILON 0.000000000001
 #define BAD_ALLOC_MESSAGE "\nBad alloc, exiting..."
-#define MENU "\n|||МЕНЮ\n0 - Добавить эл-т\t1 - удалить эл-т\n2 - обход дерева\t3 - поиск\n4 - поиск минимального(спец)\n5 - импорт из txt\n\nВыберите действие: "
+#define MENU "\n|||МЕНЮ\n0 - Добавить эл-т\t1 - удалить эл-т\n2 - обход дерева\t3 - поиск\n4 - поиск минимального(спец)\n5 - импорт из txt\t6 - вывод в graphviz\n\nВыберите действие: "
 
 typedef enum ERROR{
 	GOOD = 0,
@@ -43,6 +43,8 @@ void printTree(Node* root, int level);
 void freedom(Node* root);
 void printNode(Node* node);
 void importFromTxt(Node **root, char* filename, ERROR *err);
+void exportToDot(Node *root, char *filename, ERROR *err);
+void visualizeTree(Node* root, ERROR *err);
 
 int input(int *action, char **redString, char *INV);
 bool isInteger(double N);

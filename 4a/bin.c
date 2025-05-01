@@ -237,6 +237,7 @@ void freedom(Node *root){
 void importFromTxt(Node **root, char* filename, ERROR *err) {
 	FILE* file = fopen(filename, "r");
 	if (!file){
+		*err = BAD;
 		printf("Не удалось открыть файл %s, попробуйте ещё раз\n", filename);
 		return;
 	}
@@ -259,4 +260,65 @@ void importFromTxt(Node **root, char* filename, ERROR *err) {
 	
 	fclose(file);
 	printf("Дерево загружено из файла %s\n", filename);
+}
+
+
+void exportToDot(Node *root, char *filename, ERROR *err){
+	FILE *file = fopen(filename, "w");
+	if (!file){
+		*err = BAD;
+		return;
+	}
+	fprintf(file, "digraph BST {\n");
+	fprintf(file, "\tnode [fontname=\"Arial\", shape=circle, ordering=\"out\"];\n");
+	
+	Node* stack[MAX_STACK_SIZE];
+	int top = -1;
+	Node* cur = root;
+
+	while (cur != NULL || top >= 0) {
+		while (cur != NULL) {
+			stack[++top] = cur;
+			fprintf(file, "\t\"%p\" [label=\"%s\\n%s\"];\n", 
+				   (void*)cur, cur->key, cur->info);
+			cur = cur->left;
+		}
+
+		cur = stack[top--];
+		
+		if (cur->left) {
+			fprintf(file, "\t\"%p\" -> \"%p\" [label=\"L\"];\n", 
+				   (void*)cur, (void*)cur->left);
+		}
+		if (cur->right) {
+			fprintf(file, "\t\"%p\" -> \"%p\" [label=\"R\"];\n", 
+				   (void*)cur, (void*)cur->right);
+		}
+
+		cur = cur->right;
+	}
+
+	fprintf(file, "}\n");
+	fclose(file);
+}
+
+
+void visualizeTree(Node* root, ERROR *err) {
+	char* dot_file = "tree.dot";
+	char* png_file = "tree.png";
+	
+	exportToDot(root, dot_file, err);
+	if (*err != GOOD){
+		printf("\nНе удалось создать DOT-файл.");
+		return;
+	}
+	
+	char command[256];
+	snprintf(command, sizeof(command), "dot -Tpng %s -o %s", dot_file, png_file);
+	
+	if (system(command) == 0) {
+		printf("\nВизуализация успешна");
+	} else {
+		printf("\nОшибка, нет graphviz`a");
+	}
 }
