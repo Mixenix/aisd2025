@@ -15,25 +15,14 @@ int input(unsigned int *action, char *INV, int kindOf){
 		return BAD;
 	}
 	double f = atof(inp);
-	if (isInteger(f) == false){
+	int X = f;
+    double temp2 = N - X;
+	if (temp2 < EPSILON == false){
 		free(inp);
 		return BAD;
 	}
 	free(inp);
-	switch (kindOf){
-		case KEY:
-			*action = (unsigned int)f;
-			break;
-		case INFO:
-			*action = (unsigned int)f;
-			break;
-		case CHOICE:
-			*action = (int)f;
-			break;
-		case REL:
-			*action = (int)f;
-			break;
-	}
+	which(action, kindOf);
 	return GOOD;
 }
 
@@ -68,9 +57,19 @@ bool check_Number(char *text) {
            (first_character >= '0' && first_character <= '9');
 }
 
-bool isInteger(double N){
-    int X = N;
- 
-    double temp2 = N - X;
- 	return temp2 < EPSILON;
+void which(unsigned int *action, int kindOf){
+	switch (kindOf){
+		case KEY:
+			*action = (unsigned int)f;
+			break;
+		case INFO:
+			*action = (unsigned int)f;
+			break;
+		case CHOICE:
+			*action = (int)f;
+			break;
+		case REL:
+			*action = (int)f;
+			break;
+	}
 }

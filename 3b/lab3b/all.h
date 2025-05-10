@@ -77,7 +77,7 @@ KeySpace *search_all_versions(Table *tbl, unsigned int key, int *found_count, ER
 int is_prime(int n);
 int next_prime_size(int current_size);
 void resize(Table *tbl, ERROR *err);
-bool isInteger(double N);
+void which(unsigned int *action, int kindOf);
 bool check_Number(char *text);
 int input(unsigned int *action, char *INV, int kindOf);
 
