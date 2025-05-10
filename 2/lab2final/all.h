@@ -4,8 +4,24 @@
 #include <stdlib.h>
 #include "time.h"
 
+#define MAX_SIZE 10000
+
 typedef struct Task Task;
 typedef struct Queue Queue;
+
+typedef struct Task{
+    int ang;
+    double res;
+    Task *next;
+} Task;
+
+typedef struct Queue{
+	Task tasks[MAX_SIZE];
+	int front;
+	int rear;
+	Task *pfront;
+    Task *prear;
+} Queue;
 
 typedef int ERROR;
 
@@ -16,7 +32,7 @@ typedef int ERROR;
 #define SIZE_EXCEEDED -4
 #define QUEUE_EMPTY -5
 #define BAD_ALLOC -11
-#define MAX_SIZE 1000
+
 
 
 #ifndef QUEUE_H
