@@ -29,6 +29,7 @@ typedef int ERROR;
 
 #define EPSILON 0.000000000001
 #define SIZE_PERCENTAGE 0.7
+#define INIT_SIZE 17
 
 #define BAD_ALLOC_MESSAGE "\nBad alloc, exiting..."
 #define MENU "\nМеню\n0. Вставка элемента   1. Удалить элементы\n2. Удалить элемент по версии   3. Поиск по ключу   4. Поиск по ключу и версии\n5. Импорт из файла   6. Экспорт в файл\n7. Выход\nВыберите действие: "
@@ -60,13 +61,13 @@ Table *init(int msize, ERROR *err);
 void tbl_free(Table *tbl);
 void insert(Table *tbl, unsigned int key, unsigned int info, ERROR *err); //done
 
-int insertion(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
-int removal(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
-int srch(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
-int removalByVersion(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
-int srchByVersion(Table *tbl, unsigned int *tmp, unsigned int *tmp2, ERROR *glob_err);
-int flImport(Table *tbl, ERROR *glob_err);
-int flExport(Table *tbl, ERROR *glob_err);
+int insertion(Table *tbl, unsigned int *tmp, unsigned int *tmp2);
+int removal(Table *tbl, unsigned int *tmp, unsigned int *tmp2);
+int srch(Table *tbl, unsigned int *tmp);
+int removalByVersion(Table *tbl, unsigned int *tmp, unsigned int *tmp2);
+int srchByVersion(Table *tbl, unsigned int *tmp, unsigned int *tmp2);
+int flImport(Table *tbl);
+int flExport(Table *tbl);
 
 
 void elem_remove(Table *tbl, unsigned int key, int release, ERROR *err); //done

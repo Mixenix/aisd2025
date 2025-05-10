@@ -1,14 +1,10 @@
 #include "all.h"
 
-static unsigned long long hash(unsigned int key, int msize) {
-	unsigned char *bytes = (unsigned char *)&key;
-	unsigned long long h = INT_MAX;
-	
-	for (long unsigned int i = 0; i < sizeof(unsigned int); i++) {
-		h = h*97 +bytes[i];
-	}
-
-	return h;
+static unsigned long long hash(unsigned int key) { //хэш дженкинса
+	key = ((key >> 16) ^ key) * 0x45d9f3b;
+    key = ((key >> 16) ^ key) * 0x45d9f3b;
+    key = (key >> 16) ^ key;
+	return key;
 }
 
 Table *init(int msize, ERROR *err) {
@@ -63,7 +59,7 @@ void insert(Table *tbl, unsigned int key, unsigned int info, ERROR *err) {
 		}
 	}
 	
-	int index = hash(key, tbl->msize) % tbl->msize;
+	int index = hash(key) % tbl->msize;
 	int release = 1;
 	
 	while (tbl->ks[index].busy == USED && tbl->ks[index].key != key) {
@@ -80,6 +76,7 @@ void insert(Table *tbl, unsigned int key, unsigned int info, ERROR *err) {
 		
 		if (new_index == index){
 			*err = BAD;
+			printf("Что-то не так (размер полон?)");
 			return;
 		}
 		index = new_index;
@@ -104,7 +101,7 @@ void elem_remove(Table *tbl, unsigned int key, int release, ERROR *err) {
 		return;
 	}
 	
-	int index = hash(key, tbl->msize);
+	int index = hash(key) % tbl->msize;
 	int start_index = index;
 	do {
 		if (tbl->ks[index].busy == USED && 
@@ -136,7 +133,7 @@ KeySpace *search(Table *tbl, unsigned int key, int release, int *found_count, ER
 		return NULL;
 	}
 	
-	int index = hash(key, tbl->msize);
+	int index = hash(key) % tbl->msize;
 	int start_index = index;
 	
 	do {
@@ -190,7 +187,7 @@ KeySpace *search_all_versions(Table *tbl, unsigned int key, int *found_count, ER
 void printTable(Table *tbl) {
 	if (!tbl || !tbl->ks) return;
 	
-	printf("Хэш-таблица, размер: %d/%d):\n", tbl->csize, tbl->msize);
+	printf("Хэш-таблица, размер: %d/%d:\n", tbl->csize, tbl->msize);
 	for (int i = 0; i < tbl->msize; i++) {
 		if (tbl->ks[i].busy == USED) {
 			printf("[%d] Ключ: %u, Версия: %hhu, Инфо: %u\n",
@@ -286,7 +283,7 @@ void import(Table *tbl, char *filename, ERROR *err) {
 			return;
 		}
 
-		int index = hash(ks.key, new_tbl->msize);
+		int index = hash(ks.key) % new_tbl->msize;
 		while (new_tbl->ks[index].busy == USED) {
 			index = (index + 1) % new_tbl->msize;
 		}
@@ -338,40 +335,48 @@ int next_prime_size(int current_size) {
 }
 
 void resize(Table *tbl, ERROR *err) {
-	if (!tbl || !tbl->ks){
-		*err = BAD;
-		return;
-	}
-	
-	int new_size = next_prime_size(tbl->msize);
-	ERROR err2 = GOOD;
-	
-	Table *new_tbl = init(new_size, &err2);
-	if (err2 == BAD_ALLOC){
-		*err = BAD_ALLOC;
-		return;
-	}
-	for (int i = 0; i < tbl->msize; i++) {
-		if (tbl->ks[i].busy == USED) {
-			int new_index = hash(tbl->ks[i].key, new_tbl->msize);
-				   
-			while (new_tbl->ks[new_index].busy == USED) {
-				new_index = (new_index + 1) % new_tbl->msize;
-			}
-		
-			new_tbl->ks[new_index] = tbl->ks[i];
-			new_tbl->csize++;
-			
-			tbl->ks[i].info = NULL;
-		}
-	}
-	
-	free(tbl->ks);
-	
-	tbl->ks = new_tbl->ks;
-	tbl->msize = new_tbl->msize;
-	tbl->csize = new_tbl->csize;
-
-	free(new_tbl);
-	new_tbl->ks = NULL;
+    if (!tbl || !tbl->ks){
+        *err = BAD;
+        return;
+    }
+    
+    int new_size = next_prime_size(tbl->msize);
+    ERROR err2 = GOOD;
+    Table *new_tbl = init(new_size, &err2);
+    if (err2 == BAD_ALLOC){
+        *err = BAD_ALLOC;
+        return;
+    }
+    
+    for (int i = 0; i < tbl->msize; i++) {
+        if (tbl->ks[i].busy == USED) {
+            int new_index = hash(tbl->ks[i].key) % new_tbl->msize;
+                   
+            while (new_tbl->ks[new_index].busy == USED) {
+                new_index = (new_index + 1) % new_tbl->msize;
+            }
+        
+            new_tbl->ks[new_index].busy = USED;
+            new_tbl->ks[new_index].key = tbl->ks[i].key;
+            new_tbl->ks[new_index].release = tbl->ks[i].release;
+            new_tbl->ks[new_index].info = (unsigned int *)malloc(sizeof(unsigned int));
+            if (!new_tbl->ks[new_index].info) {
+                tbl_free(new_tbl);
+                *err = BAD_ALLOC;
+                return;
+            }
+            *new_tbl->ks[new_index].info = *tbl->ks[i].info;
+            new_tbl->csize++;
+        }
+    }
+    for (int i = 0; i < tbl->msize; i++) {
+        if (tbl->ks[i].busy == USED && tbl->ks[i].info) {
+            free(tbl->ks[i].info);
+        }
+    }
+    free(tbl->ks);
+    tbl->ks = new_tbl->ks;
+    tbl->msize = new_tbl->msize;
+    tbl->csize = new_tbl->csize;
+    free(new_tbl);
 }
