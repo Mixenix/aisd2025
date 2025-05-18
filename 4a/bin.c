@@ -196,7 +196,8 @@ Node *findMin(Node *root){
 }
 
 void printNode(Node *node){
-	if (node){printf("\n%s: %s\n", node->key, node->info);}
+	// if (node){printf("\n%s: %s\n", node->key, node->info);}
+	return;
 }
 
 
