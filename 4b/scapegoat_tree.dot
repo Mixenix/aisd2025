@@ -1,0 +1,8 @@
+digraph ScapegoatTree {
+  node [shape=record, fontname="Arial"];
+  "0x4ca6710" [label="125 | 12361263"];
+  "0x4ca79c0" [label="34674376 | 23652"];
+  "0x4ca8c70" [label="125 | 124"];
+  "0x4ca6710" -> "0x4ca79c0" [label="R"];
+  "0x4ca79c0" -> "0x4ca8c70" [label="L"];
+}
