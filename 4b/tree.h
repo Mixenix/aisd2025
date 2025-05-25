@@ -1,8 +1,6 @@
 #ifndef TREE_H
 #define TREE_H
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -27,15 +25,17 @@ typedef enum ERROR {
 } ERROR;
 
 #define BAD_ALLOC_MESSAGE "\nОшибка выделения памяти, выход...\n"
-// #define DEFAULT_ALPHA 0.6666666666666666
-#define DEFAULT_ALPHA 0.8
+#define DEFAULT_ALPHA 0.6666666666666666
+// #define DEFAULT_ALPHA 0.8
 
-typedef struct Node_t {
-	char* key;
-	unsigned int value;
-	struct Node_t* left;
-	struct Node_t* right;
-	struct Node_t* parent;
+
+typedef struct Node {
+    char* key;
+    unsigned int value;
+    struct Node* left;
+    struct Node* right;
+    struct Node* parent;
+    int size;  // New field to store the size of the subtree rooted at this node
 } Node;
 
 typedef struct {
