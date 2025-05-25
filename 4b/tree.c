@@ -4,13 +4,13 @@
 double SCAPEGOAT_ALPHA = DEFAULT_ALPHA;
 static int max_nodes_after_rebuild = 0;
 
-int sg_get_size(Node* node) {
+int get_size(Node* node) {
 	if (!node) return 0;
-	return 1 + sg_get_size(node->left) + sg_get_size(node->right);
+	return 1 + get_size(node->left) + get_size(node->right);
 }
 
 
-Node* sg_create_node(char* key, unsigned int value, Node* parent, ERROR* err) {
+Node* create_node(char* key, unsigned int value, Node* parent, ERROR* err) {
 	*err = GOOD;
 	Node* new_node = (Node*)malloc(sizeof(Node));
 	if (!new_node) {
@@ -31,17 +31,17 @@ Node* sg_create_node(char* key, unsigned int value, Node* parent, ERROR* err) {
 }
 
 
-void sg_free_node(Node* node) {
+void free_node(Node* node) {
 	if (!node) return;
 	free(node->key);
 	free(node);
 }
 
-void sg_free_tree(Node* root) {
+void free_tree(Node* root) {
 	if (!root) return;
-	sg_free_tree(root->left);
-	sg_free_tree(root->right);
-	sg_free_node(root);
+	free_tree(root->left);
+	free_tree(root->right);
+	free_node(root);
 }
 
 void flatten_subtree_to_array(Node* node, Node** arr, int* index){
@@ -64,7 +64,7 @@ Node* build_balanced_from_array(Node** arr, int start, int end, Node* parent){
 Node* actual_rebuild_logic(Node* scapegoat_node, Node* parent_of_scapegoat) {
 	if (!scapegoat_node) return NULL;
 
-	int subtree_size = sg_get_size(scapegoat_node);
+	int subtree_size = get_size(scapegoat_node);
 	if (subtree_size == 0) return NULL;
 
 	Node** arr = (Node**)malloc(subtree_size * sizeof(Node*));
@@ -84,7 +84,7 @@ Node* actual_rebuild_logic(Node* scapegoat_node, Node* parent_of_scapegoat) {
 }
 
 
-ERROR sg_insert_elem(Node** root_ptr, char* key, unsigned int value) {
+ERROR insert_elem(Node** root_ptr, char* key, unsigned int value) {
 	Node* current = *root_ptr;
 	Node* parent = NULL;
 	int depth = 0;
@@ -100,7 +100,7 @@ ERROR sg_insert_elem(Node** root_ptr, char* key, unsigned int value) {
 	}
 
 	ERROR err_node = GOOD;
-	Node* new_node = sg_create_node(key, value, parent, &err_node);
+	Node* new_node = create_node(key, value, parent, &err_node);
 	if (err_node == BAD_ALLOC) return BAD_ALLOC;
 
 	if (!parent) {
@@ -111,24 +111,21 @@ ERROR sg_insert_elem(Node** root_ptr, char* key, unsigned int value) {
 		parent->right = new_node;
 	}
 
-	int total_nodes = sg_get_size(*root_ptr);
+	int total_nodes = get_size(*root_ptr);
 	max_nodes_after_rebuild = (total_nodes > max_nodes_after_rebuild) ? total_nodes : max_nodes_after_rebuild;
 
 	if (depth > (log(total_nodes) / log(1.0 / SCAPEGOAT_ALPHA)) + 1 && total_nodes > 1){ // + 1 чтоб наверняка || проверка на условие жертвы
 		Node* scapegoat_candidate = new_node->parent;
 		Node* child_on_path = new_node;
-
 		while(scapegoat_candidate != NULL) {
-			int size_scapegoat_candidate = sg_get_size(scapegoat_candidate);
-			int size_child_on_path = sg_get_size(child_on_path);
+			int size_scapegoat_candidate = get_size(scapegoat_candidate);
+			int size_child_on_path = get_size(child_on_path);
 			if (size_child_on_path > SCAPEGOAT_ALPHA * size_scapegoat_candidate){
 				Node* parent_of_scapegoat = scapegoat_candidate->parent;
 				Node* rebuilt_subtree_root = actual_rebuild_logic(scapegoat_candidate, parent_of_scapegoat);
-
 				if (!rebuilt_subtree_root && size_scapegoat_candidate > 0){
 					return BAD_ALLOC;
 				}
-
 				if (!parent_of_scapegoat) {
 					*root_ptr = rebuilt_subtree_root;
 				} else if (parent_of_scapegoat->left == scapegoat_candidate) {
@@ -136,7 +133,7 @@ ERROR sg_insert_elem(Node** root_ptr, char* key, unsigned int value) {
 				} else {
 					parent_of_scapegoat->right = rebuilt_subtree_root;
 				}
-				max_nodes_after_rebuild = sg_get_size(*root_ptr);
+				max_nodes_after_rebuild = get_size(*root_ptr);
 				break;
 			}
 			child_on_path = scapegoat_candidate;
@@ -147,13 +144,11 @@ ERROR sg_insert_elem(Node** root_ptr, char* key, unsigned int value) {
 }
 
 
-ERROR sg_remove_elem(Node** root_ptr, char* key) {
+ERROR remove_elem(Node** root_ptr, char* key) {
 	if (!*root_ptr) return EMPTY_TREE;
-
 	Node* current = *root_ptr;
 	Node* parent = NULL;
 	Node* node_to_delete = NULL;
-
 	while (current != NULL) {
 		if (strcmp(key, current->key) == 0) {
 			node_to_delete = current;
@@ -166,7 +161,6 @@ ERROR sg_remove_elem(Node** root_ptr, char* key) {
 			current = current->right;
 		}
 	}
-
 	if (!node_to_delete) return NOT_FOUND;
 	if (!node_to_delete->left || !node_to_delete->right) {
 		Node* child = node_to_delete->left ? node_to_delete->left : node_to_delete->right;
@@ -178,7 +172,7 @@ ERROR sg_remove_elem(Node** root_ptr, char* key) {
 			parent->right = child;
 		}
 		if (child) child->parent = parent;
-		sg_free_node(node_to_delete);
+		free_node(node_to_delete);
 	}
 	else {
 		Node* successor_parent = node_to_delete;
@@ -199,10 +193,10 @@ ERROR sg_remove_elem(Node** root_ptr, char* key) {
 			successor_parent->right = successor->right;
 		}
 		if (successor->right) successor->right->parent = successor_parent;
-		sg_free_node(successor);
+		free_node(successor);
 	}
 	
-	int current_size = sg_get_size(*root_ptr);
+	int current_size = get_size(*root_ptr);
 	if (current_size > 0 && max_nodes_after_rebuild > 0 && current_size < SCAPEGOAT_ALPHA * max_nodes_after_rebuild) {
 		Node* new_root = actual_rebuild_logic(*root_ptr, NULL);
 		if (new_root || current_size == 0){
@@ -219,19 +213,17 @@ ERROR sg_remove_elem(Node** root_ptr, char* key) {
 
 void search_recursive_helper(Node* node, char* key, SearchResults* results, ERROR* err) {
 	if (!node || *err == BAD_ALLOC) return;
-
 	if (strcmp(key, node->key) <= 0){
 		search_recursive_helper(node->left, key, results, err);
 		if (*err == BAD_ALLOC) return;
 	}
-
 	if (strcmp(key, node->key) == 0) {
 		if (results->count >= results->capacity) {
 			results->capacity = (results->capacity == 0) ? 8 : results->capacity * 2;
 			Node** temp_nodes = (Node**)realloc(results->nodes, results->capacity * sizeof(Node*));
 			if (!temp_nodes) {
 				*err = BAD_ALLOC;
-				sg_free_search_results(results);
+				free_search_results(results);
 				return;
 			}
 			results->nodes = temp_nodes;
@@ -243,7 +235,7 @@ void search_recursive_helper(Node* node, char* key, SearchResults* results, ERRO
 	}
 }
 
-SearchResults sg_search_by_key(Node* root, char* key, ERROR* err) {
+SearchResults search_by_key(Node* root, char* key, ERROR* err) {
 	SearchResults results = {NULL, 0, 0};
 	*err = GOOD;
 	if (!root) return results;
@@ -252,7 +244,7 @@ SearchResults sg_search_by_key(Node* root, char* key, ERROR* err) {
 }
 
 
-SearchResults sg_find_max_keys(Node* root, ERROR* err) {
+SearchResults find_max_keys(Node* root, ERROR* err) {
 	SearchResults results = {NULL, 0, 0};
 	*err = GOOD;
 	if (!root) return results;
@@ -263,12 +255,12 @@ SearchResults sg_find_max_keys(Node* root, ERROR* err) {
 	}
 
 	if (current) {
-		return sg_search_by_key(root, current->key, err);
+		return search_by_key(root, current->key, err);
 	}
 	return results;
 }
 
-void sg_free_search_results(SearchResults* results) {
+void free_search_results(SearchResults* results) {
 	if (results) {
 		free(results->nodes);
 		results->nodes = NULL;
@@ -278,15 +270,15 @@ void sg_free_search_results(SearchResults* results) {
 }
 
 
-void sg_print_in_order(Node* root) {
+void print_in_order(Node* root) {
 	if (!root) return;
-	sg_print_in_order(root->left);
-	printf("  Key: %-20s | Value: %u\n", root->key, root->value);
-	sg_print_in_order(root->right);
+	print_in_order(root->left);
+	printf("  Ключ: %-20s | Значение: %u\n", root->key, root->value);
+	print_in_order(root->right);
 }
 
 
-void sg_print_tree_formatted(Node* root, int level, int dir) {
+void print_tree_formatted(Node* root, int level, int dir) {
 	if (!root) return;
 
 	for (int i = 0; i < level -1; i++) {
@@ -297,6 +289,96 @@ void sg_print_tree_formatted(Node* root, int level, int dir) {
 	}
 	printf("[%s: %u]\n", root->key, root->value);
 
-	sg_print_tree_formatted(root->left, level + 1, 0);
-	sg_print_tree_formatted(root->right, level + 1, 1);
+	print_tree_formatted(root->left, level + 1, 0);
+	print_tree_formatted(root->right, level + 1, 1);
+}
+
+
+ERROR import_from_txt(Node** root_ptr, char* filename) {
+	FILE* file = fopen(filename, "r");
+	if (!file) return FILE_ERROR;
+
+	char key_buf[256];
+	char val_buf[128];
+	unsigned int value;
+	ERROR err = GOOD;
+
+	while (fgets(key_buf, sizeof(key_buf), file) && fgets(val_buf, sizeof(val_buf), file)) {
+	    key_buf[strcspn(key_buf, "\r\n")] = 0;
+	    val_buf[strcspn(val_buf, "\r\n")] = 0;
+
+	    if (strlen(key_buf) == 0) continue;
+
+	    char* endptr;
+	    errno = 0;
+	    unsigned long temp_ul = strtoul(val_buf, &endptr, 10);
+
+	    if (val_buf == endptr || *endptr != '\0' || errno == ERANGE || temp_ul > UINT_MAX) {
+	        printf("Нарушение формата, пропускаем строку...\n");
+	        continue;
+	    }
+	    value = (unsigned int)temp_ul;
+
+	    err = insert_elem(root_ptr, key_buf, value);
+	    if (err == BAD_ALLOC) {
+	        fclose(file);
+	        return BAD_ALLOC;
+	    }
+	}
+	fclose(file);
+	return GOOD;
+}
+
+void export_dot_nodes_recursive(Node* node, FILE* fp) {
+	if (!node) return;
+	fprintf(fp, "  \"%p\" [label=\"%s | %u\"];\n", (void*)node, node->key, node->value);
+	export_dot_nodes_recursive(node->left, fp);
+	export_dot_nodes_recursive(node->right, fp);
+}
+
+void export_dot_edges_recursive(Node* node, FILE* fp) {
+	if (!node) return;
+	if (node->left) {
+	    fprintf(fp, "  \"%p\" -> \"%p\" [label=\"L\"];\n", (void*)node, (void*)node->left);
+	    export_dot_edges_recursive(node->left, fp);
+	}
+	if (node->right) {
+	    fprintf(fp, "  \"%p\" -> \"%p\" [label=\"R\"];\n", (void*)node, (void*)node->right);
+	    export_dot_edges_recursive(node->right, fp);
+	}
+}
+
+ERROR export_to_dot(Node* root, char* filename) {
+	FILE* fp = fopen(filename, "w");
+	if (!fp) return FILE_ERROR;
+
+	fprintf(fp, "digraph ScapegoatTree {\n");
+	fprintf(fp, "  node [shape=record, fontname=\"Arial\"];\n");
+
+	if (root) {
+		export_dot_nodes_recursive(root, fp);
+		export_dot_edges_recursive(root, fp);
+	} else {
+		fprintf(fp, "  empty [label=\"Tree is Empty\"];\n");
+	}
+
+	fprintf(fp, "}\n");
+	fclose(fp);
+	return GOOD;
+}
+
+ERROR visualize_tree_graphviz(Node* root, char* dot_filename, char* output_img_filename) {
+	ERROR err = export_to_dot(root, dot_filename);
+	if (err != GOOD) return err;
+
+	char command[512];
+	snprintf(command, sizeof(command), "dot -Tpng %s -o %s", dot_filename, output_img_filename);
+
+	int result = system(command);
+	if (result == 0) {
+		printf("Визуализация успешна");
+		return GOOD;
+	} else {
+		return BAD;
+	}
 }

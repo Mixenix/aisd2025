@@ -54,10 +54,10 @@ int main() {
 					continue;
 				}
 
-				status = sg_insert_elem(&root, inpStrKey, inpValue);
+				status = insert_elem(&root, inpStrKey, inpValue);
 				if (status == BAD_ALLOC) {
-					fprintf(stderr, BAD_ALLOC_MESSAGE);
-					sg_free_tree(root);
+					printf(BAD_ALLOC_MESSAGE);
+					free_tree(root);
 					root = NULL;
 					goto freedomAndExit;
 				} else {
@@ -83,12 +83,12 @@ int main() {
 					inpStrKey = NULL;
 					continue;
 				}
-				status = sg_remove_elem(&root, inpStrKey);
+				status = remove_elem(&root, inpStrKey);
 				if (status == NOT_FOUND) {
 					printf("Элемент '%s' не найден\n", inpStrKey);
 				} else if (status == BAD_ALLOC) {
-					fprintf(stderr, BAD_ALLOC_MESSAGE);
-					sg_free_tree(root);
+					printf(BAD_ALLOC_MESSAGE);
+					free_tree(root);
 					root = NULL;
 					goto freedomAndExit;
 				} else {
@@ -103,7 +103,7 @@ int main() {
 					printf(TREE_IS_EMPTY);
 				} else {
 					printf("\n|||Обход дерева\n");
-					sg_print_in_order(root);
+					print_in_order(root);
 					printf("|||\n");
 				}
 				break;
@@ -126,11 +126,11 @@ int main() {
 				}
 				
 				SearchResults results_search;
-				results_search = sg_search_by_key(root, inpStrKey, &status);
+				results_search = search_by_key(root, inpStrKey, &status);
 				if (status == BAD_ALLOC) {
-					fprintf(stderr, BAD_ALLOC_MESSAGE);
-					sg_free_search_results(&results_search);
-					sg_free_tree(root);
+					printf(BAD_ALLOC_MESSAGE);
+					free_search_results(&results_search);
+					free_tree(root);
 					root = NULL;
 					goto freedomAndExit;
 				}
@@ -139,7 +139,7 @@ int main() {
 				for (size_t i = 0; i < results_search.count; ++i) {
 					printf("	-> Ключ: %s, Значение: %u\n", results_search.nodes[i]->key, results_search.nodes[i]->value);
 				}
-				sg_free_search_results(&results_search);
+				free_search_results(&results_search);
 				free(inpStrKey);
 				inpStrKey = NULL;
 				break;
@@ -150,11 +150,11 @@ int main() {
 					break;
 				}
 				SearchResults results_max;
-				results_max = sg_find_max_keys(root, &status);
+				results_max = find_max_keys(root, &status);
 				if (status == BAD_ALLOC) {
-					fprintf(stderr, BAD_ALLOC_MESSAGE);
-					sg_free_search_results(&results_max);
-					sg_free_tree(root);
+					printf(BAD_ALLOC_MESSAGE);
+					free_search_results(&results_max);
+					free_tree(root);
 					root = NULL;
 					goto freedomAndExit;
 				}
@@ -166,7 +166,7 @@ int main() {
 						printf("	-> Ключ: %s, Значение: %u\n", results_max.nodes[i]->key, results_max.nodes[i]->value);
 					}
 				}
-				sg_free_search_results(&results_max);
+				free_search_results(&results_max);
 				break;
 
 			case 5:
@@ -174,7 +174,7 @@ int main() {
 					printf(TREE_IS_EMPTY);
 				} else {
 					printf("\n|||Дерево, с выводом как дерево\n");
-					sg_print_tree_formatted(root, 0, 0);
+					print_tree_formatted(root, 0, 0);
 					printf("|||\n");
 				}
 				break;
@@ -184,7 +184,7 @@ int main() {
 					printf(TREE_IS_EMPTY);
 					break;
 				}
-				status = sg_visualize_tree_graphviz(root, DOT_FILENAME, PNG_FILENAME);
+				status = visualize_tree_graphviz(root, DOT_FILENAME, PNG_FILENAME);
 				if (status == FILE_ERROR) {
 					printf("Ошибка при создании DOT-файла\n");
 				} else if (status == BAD) {
@@ -206,16 +206,16 @@ int main() {
 				}
 
 				
-				sg_free_tree(root);
+				free_tree(root);
 				root = NULL;
 				printf("Прошлое дерево удалено. Импорт нового\n");
 
-				status = sg_import_from_txt(&root, inpStrFile);
+				status = import_from_txt(&root, inpStrFile);
 				if (status == FILE_ERROR) {
 					printf("Не удалось открыть файл\n");
 				} else if (status == BAD_ALLOC) {
-					fprintf(stderr, BAD_ALLOC_MESSAGE);
-					sg_free_tree(root);
+					printf(BAD_ALLOC_MESSAGE);
+					free_tree(root);
 					root = NULL;
 					goto freedomAndExit;
 				} else {
@@ -234,7 +234,7 @@ int main() {
 	}
 
 freedomAndExit:
-	sg_free_tree(root);
+	free_tree(root);
 	if (inpStrKey) {
 		free(inpStrKey);
 	}
