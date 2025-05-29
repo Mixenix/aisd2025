@@ -1,3 +1,6 @@
+#ifndef ALL_H
+#define ALL_H
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <readline/readline.h>
@@ -35,8 +38,6 @@ typedef int ERROR;
 
 
 
-#ifndef QUEUE_H
-#define QUEUE_H
 void init(Queue *q);
 bool isEmpty(Queue *q);
 bool isFull(Queue *q);
@@ -44,19 +45,13 @@ void put(Queue *q, Task task, ERROR *err);
 void clear(Queue *q);
 Task pop(Queue *q);
 void process(int nOfChnls, int ang1, int ang2, double p1, double p2, double p3, ERROR *glob_err);
-#endif
 
 
-#ifndef INPUT_H
-#define INPUT_H
 void input(int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *p3, ERROR *glob_err);
 void check_Line(char *str, int *nOfChnls, int *ang1, int *ang2, double *p1, double *p2, double *p3, ERROR *err);
 bool check_Number(char *text);
 bool isInteger(double N);
-#endif
 
 
-#ifndef SINCALC_H
-#define SINCALC_H
 double calcSin(int angle);
 #endif
