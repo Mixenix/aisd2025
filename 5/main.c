@@ -207,7 +207,7 @@ int main(){
 		}
 		if (op_err == BAD_ALLOC){
 			err = EXIT;
-		} else {
+		} else{
 			op_err = GOOD;
 		}
 		printf("\n");
