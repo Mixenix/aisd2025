@@ -35,7 +35,7 @@ typedef struct Node {
     struct Node* left;
     struct Node* right;
     struct Node* parent;
-    int size;  // New field to store the size of the subtree rooted at this node
+    int size;
 } Node;
 
 typedef struct {
