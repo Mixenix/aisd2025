@@ -76,7 +76,6 @@ void insert(Table *tbl, unsigned int key, unsigned int info, ERROR *err) {
 		
 		if (new_index == index){
 			*err = BAD;
-			printf("Что-то не так (размер полон?)");
 			return;
 		}
 		index = new_index;
