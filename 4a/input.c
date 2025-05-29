@@ -22,7 +22,6 @@ int input(int *action, char **redString, char *INV){
 		return GOOD;
 	}
 	else{
-		free(*redString);
 		*redString = strdup(inp);
 		free(inp);
 		if (redString == NULL){
@@ -61,6 +60,8 @@ bool check_Number(char *text){
     return (is_character_sign || first_character == '.') ||
            (first_character >= '0' && first_character <= '9');
 }
+
+
 
 bool isInteger(double N){
     int X = N;

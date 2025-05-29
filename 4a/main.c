@@ -26,32 +26,25 @@ int main(){
 
 		int tmp;
 		ERROR err = GOOD;
+		
 		char *key;
+		char *info;
 		switch (action){
 		case 0: // добавить
-			key = malloc(sizeof(1));
-			if (key == NULL){
-				free(root);
-				printf(BAD_ALLOC_MESSAGE);
-				return 1;
-			}
+			
 			inpT = input(&tmp, &key, "\nВведите ключ: ");
 			while (inpT != GOOD){
 				if (inpT == EXIT){
+					freedom(root);
 					return 0;
 				}
 				if (inpT == BAD_ALLOC){
+					freedom(root);
+					printf(BAD_ALLOC_MESSAGE);
 					return 1;
 				}
 				printf("\nЧто-то не так, ещё раз");
 				inpT = input(&tmp, &key, "\nВведите ключ: ");
-			}
-			char *info = malloc(sizeof(1));
-			if (info == NULL){
-				free(root);
-				free(key);
-				printf(BAD_ALLOC_MESSAGE);
-				return 1;
 			}
 			inpT = input(&tmp, &info, "\nВведите информацию: ");
 			while (inpT != GOOD){
@@ -78,18 +71,15 @@ int main(){
 			}
 			break;
 		case 1: // удалить
-			key = malloc(sizeof(1));
-			if (key == NULL){
-				free(root);
-				printf(BAD_ALLOC_MESSAGE);
-				return 1;
-			}
 			inpT = input(&tmp, &key, "\nВведите ключ: ");
 			while (inpT != GOOD){
 				if (inpT == EXIT){
+					freedom(root);
 					return 0;
 				}
 				if (inpT == BAD_ALLOC){
+					freedom(root);
+					printf(BAD_ALLOC_MESSAGE);
 					return 1;
 				}
 				printf("\nЧто-то не так, ещё раз");
@@ -111,18 +101,15 @@ int main(){
 			}
 			break;
 		case 2: // обход
-			key = malloc(sizeof(1));
-			if (key == NULL){
-				free(root);
-				printf(BAD_ALLOC_MESSAGE);
-				return 1;
-			}
 			inpT = input(&tmp, &key, "\nВведите ключ: ");
 			while (inpT != GOOD){
 				if (inpT == EXIT){
+					freedom(root);
 					return 0;
 				}
 				if (inpT == BAD_ALLOC){
+					freedom(root);
+					printf(BAD_ALLOC_MESSAGE);
 					return 1;
 				}
 				printf("\nЧто-то не так, ещё раз");
@@ -138,18 +125,16 @@ int main(){
 			break;
 
 		case 3: // поиск
-			key = malloc(sizeof(1));
-			if (key == NULL){
-				freedom(root);
-				printf(BAD_ALLOC_MESSAGE);
-				return 1;
-			}
+			
 			inpT = input(&tmp, &key, "\nВведите ключ: ");
 			while (inpT != GOOD){
 				if (inpT == EXIT){
+					freedom(root);
 					return 0;
 				}
 				if (inpT == BAD_ALLOC){
+					freedom(root);
+					printf(BAD_ALLOC_MESSAGE);
 					return 1;
 				}
 				printf("\nЧто-то не так, ещё раз");
@@ -179,18 +164,16 @@ int main(){
 			break;
 
 		case 5: // импорт из txt
-			key = malloc(sizeof(1));
-			if (key == NULL){
-				freedom(root);
-				printf(BAD_ALLOC_MESSAGE);
-				return 1;
-			}
+			
 			inpT = input(&tmp, &key, "\nВведите название файла: ");
 			while (inpT != GOOD){
 				if (inpT == EXIT){
+					freedom(root);
 					return 0;
 				}
 				if (inpT == BAD_ALLOC){
+					freedom(root);
+					printf(BAD_ALLOC_MESSAGE);
 					return 1;
 				}
 				printf("\nЧто-то не так, ещё раз");
