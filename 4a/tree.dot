@@ -1,0 +1,8 @@
+digraph BST {
+	node [fontname="Arial", shape=circle, ordering="out"];
+	"0x4bb6000" [label="100\ndjgfgjk"];
+	"0x4bb6000" -> "0x4bb6c40" [label="R"];
+	"0x4bb6c40" [label="124\ndfjkgdj"];
+	"0x4bb6c40" -> "0x4bb7880" [label="R"];
+	"0x4bb7880" [label="13256\nkpfgjjfg"];
+}
